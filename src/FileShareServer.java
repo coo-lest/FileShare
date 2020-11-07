@@ -1,3 +1,5 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,6 +8,7 @@ public class FileShareServer {
     ServerSocket svrSocket;
 
     public FileShareServer(int port) throws IOException {
+        System.out.println("Server created");
         svrSocket = new ServerSocket(port);
 
         // Create listening thread
@@ -14,23 +17,32 @@ public class FileShareServer {
                 try {
                     System.out.printf("Listening at port %d...", port);
                     Socket clSocket = svrSocket.accept();
-                    // User authentication
-                    // ...
 
                     // Create connection thread
                     Thread connThread = new Thread(() -> {
                         try {
+                            // User authentication
+                            DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
+                            DataInputStream din = new DataInputStream((clSocket.getInputStream()));
+                            byte[] buffer = new byte[1024];
+
+                            dout.writeBytes("Login: ");
+                            int usernameLen = din.readInt();
+
+                            // Keep the connection
                             serve(clSocket);
                         } catch (Exception e) {
                             // System.err.println("connection dropped.");
                             e.printStackTrace();
                         }
                     });
+                    connThread.start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
+        listeningThread.start();
     }
 
     private void serve(Socket clSocket) {
@@ -78,9 +90,10 @@ public class FileShareServer {
 
     }
 
-    private boolean verifyUser() {
-
-        return false;
+    private boolean verifyUser(String username, String password) {
+        System.out.println("Received username: " + username);
+        System.out.println("Received password: " + password);
+        return true;
     }
 
 }
