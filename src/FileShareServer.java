@@ -13,9 +13,9 @@ public class FileShareServer {
 
         // Create listening thread
         Thread listeningThread = new Thread(() -> {
+            System.out.printf("Listening at port %d...", port);
             while (true) {
                 try {
-                    System.out.printf("Listening at port %d...", port);
                     Socket clSocket = svrSocket.accept();
 
                     // Create connection thread
@@ -26,11 +26,26 @@ public class FileShareServer {
                             DataInputStream din = new DataInputStream((clSocket.getInputStream()));
                             byte[] buffer = new byte[1024];
 
-                            dout.writeBytes("Login: ");
-                            int usernameLen = din.readInt();
+                            // Request username
+                            System.out.println("waiting for username...");
+                            String username = FileShare.receiveMsg(din).body;
+                            // Request password
+                            System.out.println("waiting for password...");
 
-                            // Keep the connection
-                            serve(clSocket);
+                            FileShare.sendMsg(dout, new Message(MessageType.REQUEST, "Password: "));
+
+                            String password = FileShare.receiveMsg(din).body;
+                            // Verify
+                            if (verifyUser(username, password)) {
+                                // Send success message
+                                FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Login successful"));
+                                // Start serving the client socket
+                                serve(clSocket);
+
+                            } else {
+                                // Abort the connection
+                                FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Wrong username or password"));
+                            }
                         } catch (Exception e) {
                             // System.err.println("connection dropped.");
                             e.printStackTrace();

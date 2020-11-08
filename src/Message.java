@@ -3,13 +3,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public class Message {
+public class Message implements Serializable {
     MessageType type;
     String body;
 
-    public Message(MessageType msgNo, String body) {
-        this.type = msgNo;
+    public Message(MessageType type, String body) {
+        this.type = type;
         this.body = body;
     }
 
@@ -29,6 +30,7 @@ public class Message {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(this);
+        out.flush();
         return out.toByteArray();
     }
 }
