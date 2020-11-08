@@ -29,29 +29,34 @@ public class FileShareClient {
 
     }
 
-    void login(String username, String address) throws IOException {
-        svrIp = address;
-        socket = new Socket(svrIp, svrPort);
-        din = new DataInputStream(socket.getInputStream());
-        dout = new DataOutputStream(socket.getOutputStream());
+    void login(String username, String address) {
+        try {
+            svrIp = address;
+            socket = new Socket(svrIp, svrPort);
+            din = new DataInputStream(socket.getInputStream());
+            dout = new DataOutputStream(socket.getOutputStream());
 
-        FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
-        // Wait for request for password
-        System.out.print(FileShare.receiveMsg(din).body);
+            FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
+            // Wait for request for password
+            System.out.print(FileShare.receiveMsg(din).body);
 
-        // Get and send password
-        String password = FileShare.scanner.nextLine();
-        FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
+            // Get and send password
+            String password = FileShare.scanner.nextLine();
+            FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
 
-        // Wait for authentication
-        Message authRes = FileShare.receiveMsg(din);
-        System.out.println(authRes.body);
-        if (authRes.type == MessageType.SUCCESS) {
-            isConnected = true;
-        } else {
-            isConnected = false;
+            // Wait for authentication
+            Message authRes = FileShare.receiveMsg(din);
+
+            System.out.println(authRes.body);
+            if (authRes.type == MessageType.SUCCESS) {
+                isConnected = true;
+            } else {
+                isConnected = false;
+            }
+            System.out.println(isConnected);
+        } catch (IOException e) {
+            System.err.println("Connection error");
         }
-        System.out.println(isConnected);
 
     }
 
