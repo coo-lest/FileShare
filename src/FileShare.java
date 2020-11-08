@@ -48,27 +48,22 @@ public class FileShare {
     }
 
 
-
-    static String receiveMsg(DataInputStream din) throws IOException {
-        String msg = "";
-
+    static Message receiveMsg(DataInputStream din) throws IOException {
         int msgLen = din.readInt();
-        byte[] buffer = new byte[1024];
-        while (msgLen > 0) {
-            int read = din.read(buffer, 0, msgLen);
-            msg += new String(buffer);
-            msgLen -= read;
-        }
+        byte[] msgByte = new byte[msgLen];
+        din.read(msgByte, 0, msgLen);
 
-        return msg;
+        return new Message(msgByte);
     }
 
-    static void sendMsg(DataOutputStream dout, String msg) throws IOException {
-        dout.writeInt(msg.length());
-        dout.writeBytes(msg);
+    static void sendMsg(DataOutputStream dout, Message msg) throws IOException {
+        byte[] bytes = msg.getBytes();
+        dout.writeInt(bytes.length);
+        dout.write(bytes);
     }
 
-    public static void main(String[] args) throws Exception{
+
+    public static void main(String[] args) throws Exception {
         FileShare fileShare = new FileShare();
         fileShare.cli();
     }

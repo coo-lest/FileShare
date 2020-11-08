@@ -34,15 +34,13 @@ public class FileShareClient {
         din = new DataInputStream(socket.getInputStream());
         dout = new DataOutputStream(socket.getOutputStream());
 
-        FileShare.sendMsg(dout, username);
-
-        System.out.println("message sent");
+        FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
         // Wait for request for password
         System.out.print(FileShare.receiveMsg(din));
 
         // Get and send password
         String password = FileShare.scanner.nextLine();
-        FileShare.sendMsg(dout, password);
+        FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
 
 
     }
