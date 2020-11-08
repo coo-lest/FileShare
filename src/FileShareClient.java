@@ -6,6 +6,7 @@ import java.net.Socket;
 public class FileShareClient {
     Socket socket;
     String svrIp;
+    boolean isConnected;
     int svrPort = 9999;
     DataInputStream din;
     DataOutputStream dout;
@@ -36,12 +37,21 @@ public class FileShareClient {
 
         FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
         // Wait for request for password
-        System.out.print(FileShare.receiveMsg(din));
+        System.out.print(FileShare.receiveMsg(din).body);
 
         // Get and send password
         String password = FileShare.scanner.nextLine();
         FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
 
+        // Wait for authentication
+        Message authRes = FileShare.receiveMsg(din);
+        System.out.println(authRes.body);
+        if (authRes.type == MessageType.SUCCESS) {
+            isConnected = true;
+        } else {
+            isConnected = false;
+        }
+        System.out.println(isConnected);
 
     }
 
