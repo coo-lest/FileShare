@@ -1,8 +1,7 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class FileShareServer {
     ServerSocket svrSocket;
@@ -108,7 +107,28 @@ public class FileShareServer {
     private boolean verifyUser(String username, String password) {
         System.out.println("Received username: " + username);
         System.out.println("Received password: " + password);
-        return true;
+
+        File authFile = new File("authorized_users");
+        if (authFile.isFile()) {
+            try {
+                FileInputStream fin = new FileInputStream(authFile);
+                Scanner fsc = new Scanner(fin);
+                String line;
+                while (fsc.hasNextLine()) {
+                    line = fsc.nextLine().trim();
+                    String[] userInfo = line.split(" ", 2);
+                    if (userInfo.length != 2) {
+                        continue;   // In case of corrupted authorized_user file
+                    }
+                    if (userInfo[0].equals(username) && userInfo[1].equals(password)) {
+                        return true;
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
 }
