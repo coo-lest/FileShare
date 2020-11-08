@@ -34,35 +34,18 @@ public class FileShareClient {
         din = new DataInputStream(socket.getInputStream());
         dout = new DataOutputStream(socket.getOutputStream());
 
-        sendMsg(dout, username);
+        FileShare.sendMsg(dout, username);
 
         System.out.println("message sent");
         // Wait for request for password
-        System.out.print(receiveMsg(din));
+        System.out.print(FileShare.receiveMsg(din));
 
         // Get and send password
         String password = FileShare.scanner.nextLine();
-        sendMsg(dout, password);
+        FileShare.sendMsg(dout, password);
 
 
     }
 
-    private String receiveMsg(DataInputStream din) throws IOException {
-        String msg = "";
 
-        int msgLen = din.readInt();
-        byte[] buffer = new byte[1024];
-        while (msgLen > 0) {
-            int read = din.read(buffer, 0, msgLen);
-            msg += new String(buffer);
-            msgLen -= read;
-        }
-
-        return msg;
-    }
-
-    private void sendMsg(DataOutputStream dout, String msg) throws IOException {
-        dout.writeInt(msg.length());
-        dout.writeBytes(msg);
-    }
 }
