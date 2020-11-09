@@ -40,7 +40,16 @@ public class FileShare {
                     login(loginInfo[0], loginInfo[1]);
                     break;
 
+                case "disc":
+                    if (cmd.length != 1) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    discover();
+                    break;
 
+                case "":
+                    break;
                 default:
                     System.out.println("Unknown command");
                     break;
@@ -52,6 +61,9 @@ public class FileShare {
         fileShareClient.login(username, address);
     }
 
+    private void discover() throws IOException {
+        fileShareClient.discover();
+    }
 
     static Message receiveMsg(DataInputStream din) throws IOException {
         int msgLen = din.readInt();
