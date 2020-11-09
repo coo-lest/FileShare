@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class FileShare {
-    final int SVR_TCP = 9999;
+    final static int SVR_TCP = 9999;
+    final static int SVR_UDP = 9998;
     FileShareServer fileShareServer;
     FileShareClient fileShareClient;
     static Scanner scanner;
 
     public FileShare() throws IOException {
-        fileShareServer = new FileShareServer(SVR_TCP);
+        fileShareServer = new FileShareServer(SVR_TCP, SVR_UDP);
         fileShareClient = new FileShareClient();
         scanner = new Scanner(System.in);
     }
