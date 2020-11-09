@@ -61,7 +61,7 @@ public class Message implements Serializable {
         udpSocket.send(msgPacket);
     }
 
-    public static Message udpReceive(DatagramSocket udpSocket) throws IOException {
+    public static Object[] udpReceive(DatagramSocket udpSocket) throws IOException {
         // Get size packet
         DatagramPacket sizePacket = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
         udpSocket.receive(sizePacket);
@@ -76,7 +76,7 @@ public class Message implements Serializable {
         udpSocket.receive((msgPacket));
         byte[] msgBytes = msgPacket.getData();
 
-        return new Message(msgBytes);
+        return new Object[]{new Message(msgBytes), msgPacket.getAddress(), msgPacket.getPort()};    // {Message, InetAddress, int}
     }
 }
 

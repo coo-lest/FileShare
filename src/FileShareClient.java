@@ -1,13 +1,18 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class FileShareClient {
     Socket socket;
+    DatagramSocket udpSocket;
     String svrIp;
     boolean isConnected;
     int svrPort = 9999;
+    int udpPort = 9998;
     DataInputStream din;
     DataOutputStream dout;
 
@@ -56,6 +61,26 @@ public class FileShareClient {
             System.out.println(isConnected);
         } catch (IOException e) {
             System.err.println("Connection error");
+        }
+
+    }
+
+    void discover() throws IOException {
+        udpSocket = new DatagramSocket(udpPort, InetAddress.getByName("255.255.255.255"));
+        // Send discovery packet
+        Message discMsg = new Message(MessageType.DISCOVERY, "");
+        Message.udpSend(udpSocket, discMsg);
+
+        // Receive response
+        DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);
+        while (true) {
+            Object[] udpRcvd = Message.udpReceive(udpSocket);  // {Message, InetAddress, int}
+            Message msg = (Message) udpRcvd[0];
+            InetAddress srcAdd = (InetAddress) udpRcvd[1];
+            int srcPort = (Integer) udpRcvd[2];
+            System.out.println(msg.type);
+            System.out.println(srcAdd);
+            System.out.println(srcPort);
         }
 
     }
