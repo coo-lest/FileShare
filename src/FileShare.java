@@ -23,14 +23,19 @@ public class FileShare {
 
             switch (cmd[0]) {
                 case "login":
+                    if (fileShareClient.isConnected) {
+                        System.out.println("Already logged in to " + fileShareClient.svrIp);
+                    }
                     if (cmd.length != 2) {
                         System.out.println("Invalid number of arguments");
+                        break;
                     }
 
                     String[] loginInfo = cmd[1].split("@");  // cmd[1] format username@address
                     if (loginInfo.length != 2) {
                         System.out.println("Invalid argument \"" + cmd[1] + "\"");
                         System.out.println("Usage: login username@address");
+                        break;
                     }
                     login(loginInfo[0], loginInfo[1]);
                     break;
