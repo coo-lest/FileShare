@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.nio.ByteBuffer;
 
 public class Message implements Serializable {
     MessageType type;
@@ -26,12 +29,54 @@ public class Message implements Serializable {
         }
     }
 
-    public byte[] getBytes() throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(this);
-        out.flush();
-        return out.toByteArray();
+    public byte[] getBytes() {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(out);
+            os.writeObject(this);
+            out.flush();
+            return out.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void udpSend(DatagramSocket udpSocket, Message msg) throws IOException {
+        byte[] msgBytes = msg.getBytes();
+
+        // Convert msg size (int) to byte[]
+        ByteBuffer bbf = ByteBuffer.allocate(Integer.BYTES);
+        bbf.putInt(msgBytes.length);
+        byte[] msgSizeBytes = bbf.array();
+
+        // Send size packet
+        DatagramPacket sizePacket = new DatagramPacket(msgSizeBytes, msgSizeBytes.length,
+                udpSocket.getInetAddress(), udpSocket.getPort());
+        udpSocket.send(sizePacket);
+
+        // Send msg packet
+        DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(), msg.getBytes().length,
+                udpSocket.getInetAddress(), udpSocket.getPort());
+        udpSocket.send(msgPacket);
+    }
+
+    public static Message udpReceive(DatagramSocket udpSocket) throws IOException {
+        // Get size packet
+        DatagramPacket sizePacket = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
+        udpSocket.receive(sizePacket);
+        byte[] msgSizeBytes = sizePacket.getData();
+
+        // Convert msg size (byte[]) to int
+        ByteBuffer bbf = ByteBuffer.wrap(msgSizeBytes);
+        int msgSize = bbf.getInt();
+
+        // Get msg packet
+        DatagramPacket msgPacket = new DatagramPacket(new byte[msgSize], msgSize);
+        udpSocket.receive((msgPacket));
+        byte[] msgBytes = msgPacket.getData();
+
+        return new Message(msgBytes);
     }
 }
 
