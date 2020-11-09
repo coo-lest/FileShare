@@ -12,7 +12,7 @@ public class FileShareClient {
     String svrIp;
     boolean isConnected;
     int svrPort = 9999;
-    int udpPort = 9998;
+    int udpSvrPort = 9998;
     DataInputStream din;
     DataOutputStream dout;
 
@@ -66,10 +66,10 @@ public class FileShareClient {
     }
 
     void discover() throws IOException {
-        udpSocket = new DatagramSocket(udpPort, InetAddress.getByName("255.255.255.255"));
+        udpSocket = new DatagramSocket();
         // Send discovery packet
         Message discMsg = new Message(MessageType.DISCOVERY, "");
-        Message.udpSend(udpSocket, discMsg);
+        Message.udpSend(udpSocket, InetAddress.getByName("255.255.255.255"), udpSvrPort, discMsg);
 
         // Receive response
         DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);

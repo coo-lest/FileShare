@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 public class Message implements Serializable {
@@ -42,7 +43,7 @@ public class Message implements Serializable {
         }
     }
 
-    public static void udpSend(DatagramSocket udpSocket, Message msg) throws IOException {
+    public static void udpSend(DatagramSocket udpSocket, InetAddress svrAdd, int svrPort, Message msg) throws IOException {
         byte[] msgBytes = msg.getBytes();
 
         // Convert msg size (int) to byte[]
@@ -52,12 +53,12 @@ public class Message implements Serializable {
 
         // Send size packet
         DatagramPacket sizePacket = new DatagramPacket(msgSizeBytes, msgSizeBytes.length,
-                udpSocket.getInetAddress(), udpSocket.getPort());
+                svrAdd, svrPort);
         udpSocket.send(sizePacket);
 
         // Send msg packet
         DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(), msg.getBytes().length,
-                udpSocket.getInetAddress(), udpSocket.getPort());
+                svrAdd, svrPort);
         udpSocket.send(msgPacket);
     }
 
