@@ -1,18 +1,19 @@
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.Scanner;
 
 public class FileShareServer {
     ServerSocket svrSocket;
+    DatagramSocket udpSocket;
 
-    public FileShareServer(int port) throws IOException {
+    public FileShareServer(int tcpPort, int udpPort) throws IOException {
         System.out.println("Server created");
-        svrSocket = new ServerSocket(port);
+        svrSocket = new ServerSocket(tcpPort);
+        udpSocket = new DatagramSocket(udpPort);
 
         // Create listening thread
         Thread listeningThread = new Thread(() -> {
-            System.out.printf("Listening at port %d...", port);
+            System.out.printf("Listening at port %d...", tcpPort);
             while (true) {
                 try {
                     Socket clSocket = svrSocket.accept();
@@ -57,6 +58,27 @@ public class FileShareServer {
             }
         });
         listeningThread.start();
+
+        // Create UDP listening thread
+        Thread udpListen = new Thread(() -> {
+            while (true) {  // TODO: isDiscoverable
+                try {
+                    System.out.println("Waiting for UDP connection");
+                    Object[] udpRcvd = Message.udpReceive(udpSocket);  // {Message, InetAddress, int}
+                    Message msg = (Message) udpRcvd[0];
+                    InetAddress srcAdd = (InetAddress) udpRcvd[1];
+                    int srcPort = (Integer) udpRcvd[2];
+
+                    if (msg.type == MessageType.DISCOVERY) {
+                        Message.udpSend(udpSocket, srcAdd, srcPort, new Message(MessageType.SUCCESS, "Computer name"));  // TODO: body: computer name
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        udpListen.start();
     }
 
     private void serve(Socket clSocket) {
