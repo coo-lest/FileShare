@@ -72,8 +72,9 @@ public class FileShareClient {
     }
 
     void discover() throws IOException {
-        udpSocket = new DatagramSocket();
+        hostList.clear();
         // Listening response
+        udpSocket = new DatagramSocket();
         Thread recResThread = new Thread(() -> {
             DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);
             while (true) {
