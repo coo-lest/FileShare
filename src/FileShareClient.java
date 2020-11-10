@@ -6,6 +6,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -77,7 +78,7 @@ public class FileShareClient {
         udpSocket = new DatagramSocket();
         Thread recResThread = new Thread(() -> {
             DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     Object[] udpRcvd = Message.udpReceive(udpSocket);
                     Message msg = (Message) udpRcvd[0];
@@ -92,13 +93,15 @@ public class FileShareClient {
                             hostList.add(host);
                         }
                     }
-
                 } catch (StreamCorruptedException sce) {
                     // Corrupt user datagram received
                     // Ignore
                 } catch (NegativeArraySizeException nase) {
                     // Corrupt user datagram received
                     // Ignore
+                } catch (SocketException e) {
+                    // Socket closed
+                    // Normal
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -119,7 +122,7 @@ public class FileShareClient {
             }
         }
         recResThread.interrupt();
-
+        udpSocket.close();
         System.out.println("Finished scanning");
     }
 
