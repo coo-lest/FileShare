@@ -1,9 +1,4 @@
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -18,14 +13,14 @@ public class Message implements Serializable {
         this.body = body;
     }
 
-    public Message(byte[] msgBytes) {
+    public Message(byte[] msgBytes) throws IOException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(msgBytes);
             ObjectInputStream is = new ObjectInputStream(in);
             Message msg = (Message) is.readObject();
             this.type = msg.type;
             this.body = msg.body;
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -62,7 +57,7 @@ public class Message implements Serializable {
         udpSocket.send(msgPacket);
     }
 
-    public static Object[] udpReceive(DatagramSocket udpSocket) throws IOException {
+    public static Object[] udpReceive(DatagramSocket udpSocket) throws IOException, NegativeArraySizeException {
         // Get size packet
         DatagramPacket sizePacket = new DatagramPacket(new byte[Integer.BYTES], Integer.BYTES);
         udpSocket.receive(sizePacket);

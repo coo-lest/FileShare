@@ -1,10 +1,14 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class FileShareClient {
     Socket socket;
@@ -15,6 +19,7 @@ public class FileShareClient {
     int udpSvrPort = 9998;
     DataInputStream din;
     DataOutputStream dout;
+    List<Host> hostList = new LinkedList<>();
 
     public FileShareClient() throws IOException {
         System.out.println("Client created");
@@ -57,6 +62,7 @@ public class FileShareClient {
                 isConnected = true;
             } else {
                 isConnected = false;
+                socket.close();
             }
             System.out.println(isConnected);
         } catch (IOException e) {
@@ -67,22 +73,53 @@ public class FileShareClient {
 
     void discover() throws IOException {
         udpSocket = new DatagramSocket();
+        // Listening response
+        Thread recResThread = new Thread(() -> {
+            DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);
+            while (true) {
+                try {
+                    Object[] udpRcvd = Message.udpReceive(udpSocket);
+                    Message msg = (Message) udpRcvd[0];
+                    InetAddress srcAdd = (InetAddress) udpRcvd[1];
+                    int srcPort = (Integer) udpRcvd[2];
+
+                    if (msg.type == MessageType.SUCCESS) {
+                        Host host = new Host(srcAdd, srcPort, msg.body);
+                        // Add new host to hostList
+                        if (!hostList.contains(host)) {
+                            System.out.println(host);
+                            hostList.add(host);
+                        }
+                    }
+
+                } catch (StreamCorruptedException sce) {
+                    // Corrupt user datagram received
+                    // Ignore
+                } catch (NegativeArraySizeException nase) {
+                    // Corrupt user datagram received
+                    // Ignore
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        recResThread.start();
+
         // Send discovery packet
-        Message discMsg = new Message(MessageType.DISCOVERY, "");
-        Message.udpSend(udpSocket, InetAddress.getByName("255.255.255.255"), udpSvrPort, discMsg);
-
-        // Receive response
-        DatagramPacket resPacket = new DatagramPacket(new byte[1024], 1024);
-        while (true) {
-            Object[] udpRcvd = Message.udpReceive(udpSocket);  // {Message, InetAddress, int}
-            Message msg = (Message) udpRcvd[0];
-            InetAddress srcAdd = (InetAddress) udpRcvd[1];
-            int srcPort = (Integer) udpRcvd[2];
-            System.out.println(msg.type);
-            System.out.println(srcAdd);
-            System.out.println(srcPort);
+        System.out.println("Scanning online hosts...");
+        int count = 0;
+        while (count++ < 5) {
+            try {
+                Message discMsg = new Message(MessageType.DISCOVERY, "");
+                Message.udpSend(udpSocket, InetAddress.getByName("255.255.255.255"), udpSvrPort, discMsg);
+                Thread.sleep(new Random().nextInt(100) + 100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+        recResThread.interrupt();
 
+        System.out.println("Finished scanning");
     }
 
 

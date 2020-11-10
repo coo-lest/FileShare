@@ -38,6 +38,17 @@ public class FileShare {
                         System.out.println("Usage: login username@address");
                         break;
                     }
+                    Host discoverdHost = null;
+                    for (Host h : fileShareClient.hostList) {
+                        if (h.name.equals(loginInfo[1])) {
+                            discoverdHost = h;
+                            break;
+                        }
+                    }
+                    if (discoverdHost != null) {
+                        login(loginInfo[0], discoverdHost.address.getHostAddress());
+                        break;
+                    }
                     login(loginInfo[0], loginInfo[1]);
                     break;
 
