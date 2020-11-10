@@ -70,9 +70,14 @@ public class FileShareServer {
                     int srcPort = (Integer) udpRcvd[2];
 
                     if (msg.type == MessageType.DISCOVERY) {
-                        Message.udpSend(udpSocket, srcAdd, srcPort, new Message(MessageType.SUCCESS, "Computer name"));  // TODO: body: computer name
+                        Message.udpSend(udpSocket, srcAdd, srcPort, new Message(MessageType.SUCCESS, InetAddress.getLocalHost().getHostName()));
                     }
-
+                } catch (NegativeArraySizeException e) {
+                    // Corrupted user datagram received
+                    // Ignore
+                } catch (StreamCorruptedException e) {
+                    // Corrupted user datagram received
+                    // Ignore
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
