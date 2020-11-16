@@ -10,6 +10,7 @@ public enum MessageType {
     DETAIL,
     RENAME,
     DELETE,
-    RMDIR
+    RMDIR,
+    CD
 
 }

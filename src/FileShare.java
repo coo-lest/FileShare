@@ -122,6 +122,15 @@ public class FileShare {
                     fileShareClient.rmdir(cmd[1]);
                     break;
 
+                case "cd":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    fileShareClient.cd(cmd[1]);
+                    break;
+
+
                 case "":
                     break;
                 default:

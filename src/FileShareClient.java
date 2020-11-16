@@ -235,4 +235,13 @@ public class FileShareClient {
             System.out.println(res.body);
         }
     }
+
+    void cd(String dirName) throws IOException {
+        FileShare.sendMsg(dout, new Message(MessageType.CD, dirName));
+        Message res = FileShare.receiveMsg(din);
+        if (res.type != MessageType.SUCCESS) {
+            System.out.println(res.body);
+        }
+
+    }
 }

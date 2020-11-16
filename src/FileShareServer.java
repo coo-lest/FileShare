@@ -147,12 +147,17 @@ public class FileShareServer {
                     deleteDirectory(dout, cwd.getCanonicalFile() + msg.body);
                     break;
 
+                case CD:
+                    changeDir(dout, cwd.getCanonicalFile() + msg.body);
+                    break;
+
             }
         }
     }
 
 
     private void makeDirectory(String path, String dirName) throws Exception {
+        // TODO: [AML] Check conditions to avoid possible exceptions
         new File(path, dirName).mkdirs();
     }
 
@@ -203,12 +208,9 @@ public class FileShareServer {
         }
     }
 
-
-    private void deleteDirectory() {
-
-    }
-
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
+        // TODO: [AML] Check conditions (not exists, is a directory, etc..) and send FAILURE messages with corresponding body
+        //  Do it with if conditions instead of try...catch here
         try {
             new File(file).delete();
             FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
@@ -218,11 +220,13 @@ public class FileShareServer {
     }
 
     private void deleteDirectory(DataOutputStream dout, String file) throws IOException {
+        // TODO: [AML] Check conditions (not exists, not empty, is a file, etc..) and send FAILURE messages with corresponding body
         new File(file).delete();
         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
     }
 
     private void rename(DataOutputStream dout, String fname, String newfname) throws IOException {
+        // TODO: [AML] Similarly, condition check
         try {
             File new_fname = new File(newfname);
             new File(fname).renameTo(new_fname);
@@ -235,6 +239,7 @@ public class FileShareServer {
 
     private void detail(DataOutputStream dout, String filename) throws IOException {
         File file = new File(filename);
+        // TODO: [AML] Nothing to do here. This is an example of condition check
         if (!file.exists()) {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exists"));
         }
@@ -258,6 +263,12 @@ public class FileShareServer {
         detailStr += ("canonical path : " + file.getCanonicalPath() + "\n");
 
         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, detailStr));
+    }
+
+    private void changeDir(DataOutputStream dout, String dirName) throws IOException {
+        // TODO: [AML] Please implement change directory function here (change `cwd`)
+        //  Use FileShare.sendMsg to send corresponding response to client (refer to the methods above)
+        //  Remember to check conditions (directory not exists, etc..) and send FAILURE message with corresponding body
     }
 
     private boolean verifyUser(String username, String password) {
