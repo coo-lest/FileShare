@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.zip.ZipOutputStream;
 
 public class FileShareServer {
     ServerSocket svrSocket;
@@ -120,25 +121,33 @@ public class FileShareServer {
         File f = new File(filename);
         if (!f.exists()) {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
-        } else {
-            // Start file transmission
-            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
-            FileInputStream fin = new FileInputStream(f);
-            byte[] buffer = new byte[1024];
-            // Transmit fSize
-            long fSize = f.length();
-            dout.writeLong(fSize);
-            // Transmit file content
-            while (fSize > 0) {
-                int read = fin.read(buffer);
-                dout.write(buffer, 0, read);
-                fSize -= read;
-            }
+            return;
+        } else if (f.isDirectory()) {
+            f = zipDir(f);
+        }
+        // Start file transmission
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        FileInputStream fin = new FileInputStream(f);
+        byte[] buffer = new byte[1024];
+        // Transmit fSize
+        long fSize = f.length();
+        dout.writeLong(fSize);
+        // Transmit file content
+        while (fSize > 0) {
+            int read = fin.read(buffer);
+            dout.write(buffer, 0, read);
+            fSize -= read;
         }
 
     }
 
-    private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws IOException {
+    private File zipDir(File dir) {
+        File zip = new File("./tmp.zip");
+        return zip;
+    }
+
+    private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws
+            IOException {
         // Create directories and file
         File f = new File(filenameWithPath);
         File dir = f.getParentFile();
