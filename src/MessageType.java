@@ -8,6 +8,7 @@ public enum MessageType {
     UPLOAD,
     MKDIR,
     DETAIL,
-    RENAME
+    RENAME,
+    DELETE
 
 }

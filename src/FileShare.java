@@ -106,6 +106,14 @@ public class FileShare {
                     fileShareClient.rename(cmd[1], cmd[2]);  // oldName, newName  whitespaces are not supported
                     break;
 
+                case "del":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    fileShareClient.delete(cmd[1]);
+                    break;
+
                 case "":
                     break;
                 default:

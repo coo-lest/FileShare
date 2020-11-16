@@ -139,6 +139,9 @@ public class FileShareServer {
                     rename(dout, cwd.getCanonicalPath() + names[0], cwd.getCanonicalPath() + names[1]);
                     break;
 
+                case DELETE:
+                    deleteFile(dout, cwd.getCanonicalPath() + msg.body);
+                    break;
             }
         }
     }
@@ -195,16 +198,18 @@ public class FileShareServer {
         }
     }
 
-    private void deleteFile() {
-
-    }
 
     private void deleteDirectory() {
 
     }
 
-    private void deleteFile(String file) {
-        new File(file).delete();
+    private void deleteFile(DataOutputStream dout, String file) throws IOException {
+        try {
+            new File(file).delete();
+            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+        } catch (Exception e) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+        }
     }
 
     private void deleteDirectory(String file) {

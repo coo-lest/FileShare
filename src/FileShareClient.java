@@ -219,4 +219,12 @@ public class FileShareClient {
             System.out.println(res.body);
         }
     }
+
+    void delete(String filename) throws IOException {
+        FileShare.sendMsg(dout, new Message(MessageType.DELETE,  filename));
+        Message res = FileShare.receiveMsg(din);
+        if (res.type != MessageType.SUCCESS) {
+            System.out.println(res.body);
+        }
+    }
 }
