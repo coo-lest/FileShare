@@ -119,6 +119,7 @@ public class FileShareServer {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
         } else {
             // Start file transmission
+            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
             FileInputStream fin = new FileInputStream(f);
             byte[] buffer = new byte[1024];
             // Transmit fSize

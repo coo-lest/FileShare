@@ -124,15 +124,22 @@ public class FileShareClient {
     }
 
     void download(String filename, String savePath) throws IOException {
+        if (!isConnected) {
+            System.out.println("Not connected to any host. Please login.");
+            return;
+        }
         // Send DOWNLOAD request
         FileShare.sendMsg(dout, new Message(MessageType.DOWNLOAD, filename));
         // Receive reply from server
         Message reply = FileShare.receiveMsg(din);
         // If transmission can be started
         if (reply.type == MessageType.SUCCESS) {
-            // Start transmission
-            File f = new File(savePath + "/" + filename);
+            // Create directories and file
+            File f = new File(savePath, filename);
+            File dir = f.getParentFile();
+            dir.mkdirs();
             // TODO: check duplicated filename
+            // Start transmission
             FileOutputStream fout = new FileOutputStream(f);
             byte[] buffer = new byte[1024];
             long fSize = din.readLong();

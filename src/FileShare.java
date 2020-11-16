@@ -60,6 +60,16 @@ public class FileShare {
                     discover();
                     break;
 
+                case "download":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+
+                    // TODO: support whitespace in the path
+                    String filename = cmd[1];
+                    fileShareClient.download(filename, "./Downloads");
+
                 case "":
                     break;
                 default:
