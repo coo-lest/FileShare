@@ -153,4 +153,45 @@ public class FileShareClient {
         }
     }
 
+    void upload(String filename, String uploadPath) throws IOException {
+        if (!isConnected) {
+            System.out.println("Not connected to any host. Please login.");
+            return;
+        }
+
+        // Check local file
+        File f = new File(filename);
+        System.out.println("FILENAME: " + f.getName());
+        if (!f.exists()) {
+            System.out.println("File not exists");
+            return;
+        } else if (f.isDirectory()) {
+            System.out.println(filename + " is a directory");
+            return;
+            // TODO: add directory support
+        }
+
+        // Send UPLOAD request
+        FileShare.sendMsg(dout, new Message(MessageType.UPLOAD, uploadPath + "/" + f.getName()));
+
+        // Receive reply from server
+        Message reply = FileShare.receiveMsg(din);
+        if (reply.type == MessageType.SUCCESS) {
+            // Start transmission
+            FileInputStream fin = new FileInputStream(f);
+            byte[] buffer = new byte[1024];
+            // Transmit fSize
+            long fSize = f.length();
+            dout.writeLong(fSize);
+            // Transmit file content
+            while (fSize > 0) {
+                int read = fin.read(buffer);
+                dout.write(buffer, 0, read);
+                fSize -= read;
+            }
+        } else {
+            System.out.println(reply.body);
+        }
+    }
+
 }

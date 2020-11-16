@@ -101,6 +101,9 @@ public class FileShareServer {
                     String filename = msg.body;
                     sendFile(dout, filename);
                     break;
+                case UPLOAD:
+                    String filenameWithPath = msg.body;
+                    receiveFile(din, dout, filenameWithPath);
             }
         }
     }
@@ -135,8 +138,21 @@ public class FileShareServer {
 
     }
 
-    private void receiveFile() {
-
+    private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws IOException {
+        // Create directories and file
+        File f = new File(filenameWithPath);
+        File dir = f.getParentFile();
+        dir.mkdirs();
+        // Start transmission
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        FileOutputStream fout = new FileOutputStream(f);
+        byte[] buffer = new byte[1024];
+        long fSize = din.readLong();
+        while (fSize > 0) {
+            int read = din.read(buffer);
+            fout.write(buffer, 0, read);
+            fSize -= read;
+        }
     }
 
     private void deleteFile() {

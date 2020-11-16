@@ -69,7 +69,17 @@ public class FileShare {
                     // TODO: support whitespace in the path
                     String filename = cmd[1];
                     fileShareClient.download(filename, "./Downloads");
+                    break;
 
+                case "upload":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    // TODO: support whitespace in the path
+                    String upFname = cmd[1];
+                    fileShareClient.upload(upFname, "./Upload");
+                    break;
                 case "":
                     break;
                 default:
