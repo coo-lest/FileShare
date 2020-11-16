@@ -90,6 +90,14 @@ public class FileShare {
                     fileShareClient.mkdir(dirName);
                     break;
 
+                case "detail":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    fileShareClient.detail(cmd[1]);
+                    break;
+
                 case "":
                     break;
                 default:

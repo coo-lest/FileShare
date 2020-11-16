@@ -6,6 +6,7 @@ public enum MessageType {
     DISCOVERY,
     DOWNLOAD,
     UPLOAD,
-    MKDIR
+    MKDIR,
+    DETAIL
 
 }

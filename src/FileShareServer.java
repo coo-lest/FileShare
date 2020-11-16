@@ -111,9 +111,13 @@ public class FileShareServer {
                     String dirName = msg.body;
                     try {
                         makeDirectory(dirName);
+                        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
                     } catch (Exception e) {
                         FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
                     }
+                    break;
+                case DETAIL:
+                    detail(dout, msg.body);  // msg.body is the filename
                     break;
 
             }
@@ -194,24 +198,31 @@ public class FileShareServer {
 
     }
 
-    private void detail(String filename) throws IOException {
+    private void detail(DataOutputStream dout, String filename) throws IOException {
         File file = new File(filename);
-        System.out.println("name : " + file.getName());
-        System.out.println("size (bytes) : " + file.length());
-        System.out.println("absolute path? : " + file.isAbsolute());
-        System.out.println("exists? : " + file.exists());
-        System.out.println("hidden? : " + file.isHidden());
-        System.out.println("dir? : " + file.isDirectory());
-        System.out.println("file? : " + file.isFile());
-        System.out.println("modified (timestamp) : " + file.lastModified());
-        System.out.println("readable? : " + file.canRead());
-        System.out.println("writable? : " + file.canWrite());
-        System.out.println("executable? : " + file.canExecute());
-        System.out.println("parent : " + file.getParent());
-        System.out.println("absolute file : " + file.getAbsoluteFile());
-        System.out.println("absolute path : " + file.getAbsolutePath());
-        System.out.println("canonical file : " + file.getCanonicalFile());
-        System.out.println("canonical path : " + file.getCanonicalPath());
+        if (!file.exists()) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exists"));
+        }
+
+        String detailStr = "";
+        detailStr += ("name : " + file.getName() + "\n");
+        detailStr += ("size (bytes) : " + file.length() + "\n");
+        detailStr += ("absolute path? : " + file.isAbsolute() + "\n");
+        detailStr += ("exists? : " + file.exists() + "\n");
+        detailStr += ("hidden? : " + file.isHidden() + "\n");
+        detailStr += ("dir? : " + file.isDirectory() + "\n");
+        detailStr += ("file? : " + file.isFile() + "\n");
+        detailStr += ("modified (timestamp) : " + file.lastModified() + "\n");
+        detailStr += ("readable? : " + file.canRead() + "\n");
+        detailStr += ("writable? : " + file.canWrite() + "\n");
+        detailStr += ("executable? : " + file.canExecute() + "\n");
+        detailStr += ("parent : " + file.getParent() + "\n");
+        detailStr += ("absolute file : " + file.getAbsoluteFile() + "\n");
+        detailStr += ("absolute path : " + file.getAbsolutePath() + "\n");
+        detailStr += ("canonical file : " + file.getCanonicalFile() + "\n");
+        detailStr += ("canonical path : " + file.getCanonicalPath() + "\n");
+
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, detailStr));
     }
 
     private boolean verifyUser(String username, String password) {

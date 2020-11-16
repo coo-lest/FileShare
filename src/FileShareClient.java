@@ -201,4 +201,14 @@ public class FileShareClient {
             System.out.println(res.body);
         }
     }
+
+    void detail(String filename) throws IOException {
+        FileShare.sendMsg(dout, new Message(MessageType.DETAIL, filename));
+        Message res = FileShare.receiveMsg(din);
+        if (res.type == MessageType.SUCCESS) {
+            System.out.println(res.body);
+        } else {
+            System.out.println(res.body);
+        }
+    }
 }
