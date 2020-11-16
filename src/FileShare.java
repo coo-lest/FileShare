@@ -80,6 +80,16 @@ public class FileShare {
                     String upFname = cmd[1];
                     fileShareClient.upload(upFname, "./Upload");
                     break;
+
+                case "mkdir":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    String dirName = cmd[1];
+                    fileShareClient.mkdir(dirName);
+                    break;
+
                 case "":
                     break;
                 default:

@@ -194,4 +194,11 @@ public class FileShareClient {
         }
     }
 
+    void mkdir(String dirName) throws IOException {
+        FileShare.sendMsg(dout, new Message(MessageType.MKDIR, dirName));
+        Message res = FileShare.receiveMsg(din);
+        if (res.type != MessageType.SUCCESS) {
+            System.out.println(res.body);
+        }
+    }
 }

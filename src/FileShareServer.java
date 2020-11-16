@@ -106,16 +106,23 @@ public class FileShareServer {
                 case UPLOAD:
                     String filenameWithPath = msg.body;
                     receiveFile(din, dout, filenameWithPath);
+                    break;
+                case MKDIR:
+                    String dirName = msg.body;
+                    try {
+                        makeDirectory(dirName);
+                    } catch (Exception e) {
+                        FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+                    }
+                    break;
+
             }
         }
     }
 
-    private void sendList() {
 
-    }
-
-    private void makeDirectory(String file_path) {
-        new File(file_path).mkdirs();
+    private void makeDirectory(String filePath) throws Exception {
+        new File(filePath).mkdirs();
     }
 
     private void sendFile(DataOutputStream dout, String filename) throws IOException {
