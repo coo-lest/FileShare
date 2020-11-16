@@ -1,7 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -126,5 +123,75 @@ public class FileShareClient {
         System.out.println("Finished scanning");
     }
 
+    void download(String filename, String savePath) throws IOException {
+        if (!isConnected) {
+            System.out.println("Not connected to any host. Please login.");
+            return;
+        }
+        // Send DOWNLOAD request
+        FileShare.sendMsg(dout, new Message(MessageType.DOWNLOAD, filename));
+        // Receive reply from server
+        Message reply = FileShare.receiveMsg(din);
+        // If transmission can be started
+        if (reply.type == MessageType.SUCCESS) {
+            // Create directories and file
+            File f = new File(savePath, filename);
+            File dir = f.getParentFile();
+            dir.mkdirs();
+            // TODO: check duplicated filename
+            // Start transmission
+            FileOutputStream fout = new FileOutputStream(f);
+            byte[] buffer = new byte[1024];
+            long fSize = din.readLong();
+            while (fSize > 0) {
+                int read = din.read(buffer);
+                fout.write(buffer, 0, read);
+                fSize -= read;
+            }
+        } else {
+            System.out.println(reply.body);
+        }
+    }
+
+    void upload(String filename, String uploadPath) throws IOException {
+        if (!isConnected) {
+            System.out.println("Not connected to any host. Please login.");
+            return;
+        }
+
+        // Check local file
+        File f = new File(filename);
+        System.out.println("FILENAME: " + f.getName());
+        if (!f.exists()) {
+            System.out.println("File not exists");
+            return;
+        } else if (f.isDirectory()) {
+            System.out.println(filename + " is a directory");
+            return;
+            // TODO: add directory support
+        }
+
+        // Send UPLOAD request
+        FileShare.sendMsg(dout, new Message(MessageType.UPLOAD, uploadPath + "/" + f.getName()));
+
+        // Receive reply from server
+        Message reply = FileShare.receiveMsg(din);
+        if (reply.type == MessageType.SUCCESS) {
+            // Start transmission
+            FileInputStream fin = new FileInputStream(f);
+            byte[] buffer = new byte[1024];
+            // Transmit fSize
+            long fSize = f.length();
+            dout.writeLong(fSize);
+            // Transmit file content
+            while (fSize > 0) {
+                int read = fin.read(buffer);
+                dout.write(buffer, 0, read);
+                fSize -= read;
+            }
+        } else {
+            System.out.println(reply.body);
+        }
+    }
 
 }

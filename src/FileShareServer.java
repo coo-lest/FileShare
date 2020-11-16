@@ -1,7 +1,7 @@
-
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.zip.ZipOutputStream;
 
 public class FileShareServer {
 
@@ -12,13 +12,13 @@ public class FileShareServer {
         System.out.println("Server created");
         svrSocket = new ServerSocket(tcpPort);
         udpSocket = new DatagramSocket(udpPort);
-        Socket clSocket = svrSocket.accept();
 
         // Create listening thread
         Thread listeningThread = new Thread(() -> {
             System.out.printf("Listening at port %d...", tcpPort);
             while (true) {
                 try {
+                    Socket clSocket = svrSocket.accept();
 
                     // Create connection thread
                     Thread connThread = new Thread(() -> {
@@ -54,7 +54,7 @@ public class FileShareServer {
                         }
                     });
                     connThread.start();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -88,14 +88,25 @@ public class FileShareServer {
         udpListen.start();
     }
 
-    private void serve(Socket clSocket) {
+    private void serve(Socket clSocket) throws IOException {
         System.out.printf("Established a connection to host %s:%d\n\n", clSocket.getInetAddress(),
                 clSocket.getPort());
-        while (true) {
-            // Get stream
+        // Get stream
+        DataInputStream din = new DataInputStream(clSocket.getInputStream());
+        DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
 
+        while (true) {
             // Get request type
-            // Respond (call the private functions)
+            Message msg = FileShare.receiveMsg(din);
+            switch (msg.type) {
+                case DOWNLOAD:
+                    String filename = msg.body;
+                    sendFile(dout, filename);
+                    break;
+                case UPLOAD:
+                    String filenameWithPath = msg.body;
+                    receiveFile(din, dout, filenameWithPath);
+            }
         }
     }
 
@@ -107,37 +118,59 @@ public class FileShareServer {
         new File(file_path).mkdirs();
     }
 
-    private void sendFile(String file, Socket socket) throws IOException {
-        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-        FileInputStream fis = new FileInputStream(file);
-        byte[] buffer = new byte[4096];
-
-        while (fis.read(buffer) > 0) {
-            dos.write(buffer);
+    private void sendFile(DataOutputStream dout, String filename) throws IOException {
+        File f = new File(filename);
+        if (!f.exists()) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
+            return;
+        } else if (f.isDirectory()) {
+            f = zipDir(f);
+        }
+        // Start file transmission
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        FileInputStream fin = new FileInputStream(f);
+        byte[] buffer = new byte[1024];
+        // Transmit fSize
+        long fSize = f.length();
+        dout.writeLong(fSize);
+        // Transmit file content
+        while (fSize > 0) {
+            int read = fin.read(buffer);
+            dout.write(buffer, 0, read);
+            fSize -= read;
         }
 
-        fis.close();
-        dos.close();
     }
 
-    private void receiveFile(String File, Socket clientSock) throws Exception {
-        DataInputStream dis = new DataInputStream(clientSock.getInputStream());
-        FileOutputStream fos = new FileOutputStream(File);
-        byte[] buffer = new byte[4096];
+    private File zipDir(File dir) {
+        File zip = new File("./tmp.zip");
+        return zip;
+    }
 
-        int filesize = 15123; // Send file size in separate msg
-        int read = 0;
-        int totalRead = 0;
-        int remaining = filesize;
-        while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
-            totalRead += read;
-            remaining -= read;
-            System.out.println("read " + totalRead + " bytes.");
-            fos.write(buffer, 0, read);
+    private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws
+            IOException {
+        // Create directories and file
+        File f = new File(filenameWithPath);
+        File dir = f.getParentFile();
+        dir.mkdirs();
+        // Start transmission
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        FileOutputStream fout = new FileOutputStream(f);
+        byte[] buffer = new byte[1024];
+        long fSize = din.readLong();
+        while (fSize > 0) {
+            int read = din.read(buffer);
+            fout.write(buffer, 0, read);
+            fSize -= read;
         }
+    }
 
-        fos.close();
-        dis.close();
+    private void deleteFile() {
+
+    }
+
+    private void deleteDirectory() {
+
     }
 
     private void deleteFile(String file) {
