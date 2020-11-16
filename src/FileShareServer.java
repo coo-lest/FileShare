@@ -134,6 +134,11 @@ public class FileShareServer {
                     detail(dout, cwd.getCanonicalPath() + File.separator + msg.body);  // msg.body is the filename
                     break;
 
+                case RENAME:
+                    String[] names = msg.body.split("/");  // names[0] == oldName, names[1] == newName
+                    rename(dout, cwd.getCanonicalPath() + names[0], cwd.getCanonicalPath() + names[1]);
+                    break;
+
             }
         }
     }
@@ -206,9 +211,14 @@ public class FileShareServer {
         new File(file).delete();
     }
 
-    private void rename(String fname, String newfname) {
-        File new_fname = new File(newfname);
-        new File(fname).renameTo(new_fname);
+    private void rename(DataOutputStream dout, String fname, String newfname) throws IOException {
+        try {
+            File new_fname = new File(newfname);
+            new File(fname).renameTo(new_fname);
+            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+        } catch (Exception e) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+        }
 
     }
 

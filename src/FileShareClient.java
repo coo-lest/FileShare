@@ -211,4 +211,12 @@ public class FileShareClient {
             System.out.println(res.body);
         }
     }
+
+    void rename(String oldName, String newName) throws IOException {
+        FileShare.sendMsg(dout, new Message(MessageType.RENAME, oldName + "/" + newName));
+        Message res = FileShare.receiveMsg(din);
+        if (res.type != MessageType.SUCCESS) {
+            System.out.println(res.body);
+        }
+    }
 }

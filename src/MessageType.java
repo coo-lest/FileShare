@@ -7,6 +7,7 @@ public enum MessageType {
     DOWNLOAD,
     UPLOAD,
     MKDIR,
-    DETAIL
+    DETAIL,
+    RENAME
 
 }
