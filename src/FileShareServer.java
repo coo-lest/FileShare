@@ -7,11 +7,21 @@ public class FileShareServer {
 
     ServerSocket svrSocket;
     DatagramSocket udpSocket;
+    File sharedRoot;
 
-    public FileShareServer(int tcpPort, int udpPort) throws IOException {
+    public FileShareServer(int tcpPort, int udpPort, String rootPath) throws IOException {
         System.out.println("Server created");
         svrSocket = new ServerSocket(tcpPort);
         udpSocket = new DatagramSocket(udpPort);
+        File sharedRoot = new File(rootPath);
+
+        // Validate sharedRoot
+        if (!sharedRoot.exists()) {
+            sharedRoot.mkdirs();
+        } else if (!sharedRoot.isDirectory()) {
+            System.out.println("Invalid configuration for shared root");
+            System.exit(1);
+        }
 
         // Create listening thread
         Thread listeningThread = new Thread(() -> {
@@ -91,6 +101,7 @@ public class FileShareServer {
     private void serve(Socket clSocket) throws IOException {
         System.out.printf("Established a connection to host %s:%d\n\n", clSocket.getInetAddress(),
                 clSocket.getPort());
+        File cwd = new File(sharedRoot.getCanonicalPath());
         // Get stream
         DataInputStream din = new DataInputStream(clSocket.getInputStream());
         DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
@@ -101,23 +112,26 @@ public class FileShareServer {
             switch (msg.type) {
                 case DOWNLOAD:
                     String filename = msg.body;
-                    sendFile(dout, filename);
+                    sendFile(dout, cwd.getCanonicalPath() + File.separator + filename);
                     break;
+
                 case UPLOAD:
                     String filenameWithPath = msg.body;
-                    receiveFile(din, dout, filenameWithPath);
+                    receiveFile(din, dout, cwd.getCanonicalPath() + File.separator + filenameWithPath);
                     break;
+
                 case MKDIR:
                     String dirName = msg.body;
                     try {
-                        makeDirectory(dirName);
+                        makeDirectory(cwd.getCanonicalPath(), dirName);
                         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
                     } catch (Exception e) {
                         FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
                     }
                     break;
+
                 case DETAIL:
-                    detail(dout, msg.body);  // msg.body is the filename
+                    detail(dout, cwd.getCanonicalPath() + File.separator + msg.body);  // msg.body is the filename
                     break;
 
             }
@@ -125,8 +139,8 @@ public class FileShareServer {
     }
 
 
-    private void makeDirectory(String filePath) throws Exception {
-        new File(filePath).mkdirs();
+    private void makeDirectory(String path, String dirName) throws Exception {
+        new File(path, dirName).mkdirs();
     }
 
     private void sendFile(DataOutputStream dout, String filename) throws IOException {
