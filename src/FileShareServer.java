@@ -142,6 +142,11 @@ public class FileShareServer {
                 case DELETE:
                     deleteFile(dout, cwd.getCanonicalPath() + msg.body);
                     break;
+
+                case RMDIR:
+                    deleteDirectory(dout, cwd.getCanonicalFile() + msg.body);
+                    break;
+
             }
         }
     }
@@ -212,8 +217,9 @@ public class FileShareServer {
         }
     }
 
-    private void deleteDirectory(String file) {
+    private void deleteDirectory(DataOutputStream dout, String file) throws IOException {
         new File(file).delete();
+        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
     }
 
     private void rename(DataOutputStream dout, String fname, String newfname) throws IOException {

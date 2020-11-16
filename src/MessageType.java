@@ -9,6 +9,7 @@ public enum MessageType {
     MKDIR,
     DETAIL,
     RENAME,
-    DELETE
+    DELETE,
+    RMDIR
 
 }

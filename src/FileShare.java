@@ -114,6 +114,14 @@ public class FileShare {
                     fileShareClient.delete(cmd[1]);
                     break;
 
+                case "rmdir":
+                    if (cmd.length != 2) {
+                        System.out.println("Invalid number of argument");
+                        break;
+                    }
+                    fileShareClient.rmdir(cmd[1]);
+                    break;
+
                 case "":
                     break;
                 default:
