@@ -86,16 +86,22 @@ public class FileShareServer {
         udpListen.start();
     }
 
-    private void serve(Socket clSocket) {
+    private void serve(Socket clSocket) throws IOException {
         System.out.printf("Established a connection to host %s:%d\n\n", clSocket.getInetAddress(),
                 clSocket.getPort());
+        // Get stream
+        DataInputStream din = new DataInputStream(clSocket.getInputStream());
+        DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
+
         while (true) {
-            // Get stream
-
             // Get request type
-
-            // Respond (call the private functions)
-
+            Message msg = FileShare.receiveMsg(din);
+            switch (msg.type) {
+                case DOWNLOAD:
+                    String filename = msg.body;
+                    sendFile(dout, filename);
+                    break;
+            }
         }
     }
 
@@ -107,7 +113,24 @@ public class FileShareServer {
 
     }
 
-    private void sendFile() {
+    private void sendFile(DataOutputStream dout, String filename) throws IOException {
+        File f = new File(filename);
+        if (!f.exists()) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
+        } else {
+            // Start file transmission
+            FileInputStream fin = new FileInputStream(f);
+            byte[] buffer = new byte[1024];
+            // Transmit fSize
+            long fSize = f.length();
+            dout.writeLong(fSize);
+            // Transmit file content
+            while (fSize > 0) {
+                int read = fin.read(buffer);
+                dout.write(buffer, 0, read);
+                fSize -= read;
+            }
+        }
 
     }
 

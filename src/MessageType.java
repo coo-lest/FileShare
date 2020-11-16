@@ -4,5 +4,7 @@ public enum MessageType {
     DATA,
     REQUEST,
     DISCOVERY,
+    DOWNLOAD,
+    UPLOAD
 
 }

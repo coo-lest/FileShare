@@ -1,7 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -126,5 +123,27 @@ public class FileShareClient {
         System.out.println("Finished scanning");
     }
 
+    void download(String filename, String savePath) throws IOException {
+        // Send DOWNLOAD request
+        FileShare.sendMsg(dout, new Message(MessageType.DOWNLOAD, filename));
+        // Receive reply from server
+        Message reply = FileShare.receiveMsg(din);
+        // If transmission can be started
+        if (reply.type == MessageType.SUCCESS) {
+            // Start transmission
+            File f = new File(savePath + "/" + filename);
+            // TODO: check duplicated filename
+            FileOutputStream fout = new FileOutputStream(f);
+            byte[] buffer = new byte[1024];
+            long fSize = din.readLong();
+            while (fSize > 0) {
+                int read = din.read(buffer);
+                fout.write(buffer, 0, read);
+                fSize -= read;
+            }
+        } else {
+            System.out.println(reply.body);
+        }
+    }
 
 }
