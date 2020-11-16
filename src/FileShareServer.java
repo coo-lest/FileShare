@@ -1,8 +1,10 @@
+
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
 public class FileShareServer {
+
     ServerSocket svrSocket;
     DatagramSocket udpSocket;
 
@@ -10,13 +12,13 @@ public class FileShareServer {
         System.out.println("Server created");
         svrSocket = new ServerSocket(tcpPort);
         udpSocket = new DatagramSocket(udpPort);
+        Socket clSocket = svrSocket.accept();
 
         // Create listening thread
         Thread listeningThread = new Thread(() -> {
             System.out.printf("Listening at port %d...", tcpPort);
             while (true) {
                 try {
-                    Socket clSocket = svrSocket.accept();
 
                     // Create connection thread
                     Thread connThread = new Thread(() -> {
@@ -52,7 +54,7 @@ public class FileShareServer {
                         }
                     });
                     connThread.start();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -93,9 +95,7 @@ public class FileShareServer {
             // Get stream
 
             // Get request type
-
             // Respond (call the private functions)
-
         }
     }
 
@@ -103,32 +103,75 @@ public class FileShareServer {
 
     }
 
-    private void makeDirectory() {
+    private void makeDirectory(String file_path) {
+        new File(file_path).mkdirs();
+    }
+
+    private void sendFile(String file, Socket socket) throws IOException {
+        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+        FileInputStream fis = new FileInputStream(file);
+        byte[] buffer = new byte[4096];
+
+        while (fis.read(buffer) > 0) {
+            dos.write(buffer);
+        }
+
+        fis.close();
+        dos.close();
+    }
+
+    private void receiveFile(String File, Socket clientSock) throws Exception {
+        DataInputStream dis = new DataInputStream(clientSock.getInputStream());
+        FileOutputStream fos = new FileOutputStream(File);
+        byte[] buffer = new byte[4096];
+
+        int filesize = 15123; // Send file size in separate msg
+        int read = 0;
+        int totalRead = 0;
+        int remaining = filesize;
+        while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+            totalRead += read;
+            remaining -= read;
+            System.out.println("read " + totalRead + " bytes.");
+            fos.write(buffer, 0, read);
+        }
+
+        fos.close();
+        dis.close();
+    }
+
+    private void deleteFile(String file) {
+        new File(file).delete();
+    }
+
+    private void deleteDirectory(String file) {
+        new File(file).delete();
+    }
+
+    private void rename(String fname, String newfname) {
+        File new_fname = new File(newfname);
+        new File(fname).renameTo(new_fname);
 
     }
 
-    private void sendFile() {
-
-    }
-
-    private void receiveFile() {
-
-    }
-
-    private void deleteFile() {
-
-    }
-
-    private void deleteDirectory() {
-
-    }
-
-    private void rename() {
-
-    }
-
-    private void detail() {
-
+    private void detail(String filename) throws IOException {
+        File file = new File(filename);
+        System.out.println("name : " + file.getName());
+        System.out.println("size (bytes) : " + file.length());
+        System.out.println("absolute path? : " + file.isAbsolute());
+        System.out.println("exists? : " + file.exists());
+        System.out.println("hidden? : " + file.isHidden());
+        System.out.println("dir? : " + file.isDirectory());
+        System.out.println("file? : " + file.isFile());
+        System.out.println("modified (timestamp) : " + file.lastModified());
+        System.out.println("readable? : " + file.canRead());
+        System.out.println("writable? : " + file.canWrite());
+        System.out.println("executable? : " + file.canExecute());
+        System.out.println("parent : " + file.getParent());
+        System.out.println("absolute file : " + file.getAbsoluteFile());
+        System.out.println("absolute path : " + file.getAbsolutePath());
+        System.out.println("canonical file : " + file.getCanonicalFile());
+        System.out.println("canonical path : " + file.getCanonicalPath());
     }
 
     private boolean verifyUser(String username, String password) {
