@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
@@ -151,6 +152,10 @@ public class FileShareServer {
                     changeDir(dout, cwd.getCanonicalFile() + File.separator + msg.body);
                     break;
 
+                case TREE:
+                    sendTree(dout);
+                    break;
+
             }
         }
     }
@@ -298,6 +303,17 @@ public class FileShareServer {
             }
         }
         return false;
+    }
+
+    private void sendTree(DataOutputStream dout) throws IOException {
+        try {
+            JTree tree = GUI.buildTree(sharedRoot);
+            ObjectOutputStream oos = new ObjectOutputStream(dout);
+            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start tree transmission"));
+            oos.writeObject(tree);
+        } catch (Exception e) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+        }
     }
 
 }

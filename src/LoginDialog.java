@@ -1,6 +1,3 @@
-import com.sun.scenario.effect.impl.sw.java.JSWBoxBlurPeer;
-import javafx.scene.layout.Pane;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;

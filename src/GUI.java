@@ -1,5 +1,3 @@
-import javafx.scene.layout.Pane;
-
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -8,6 +6,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class GUI extends JFrame {
     FileShare main;  // Pointer to main class
@@ -114,6 +114,19 @@ public class GUI extends JFrame {
         // Reload local tree
         locFT = buildTree(new File("."));  // TODO: set download path
         // Fetch remote tree
+        try {
+            FileShare.sendMsg(main.fileShareClient.dout, new Message(MessageType.TREE, ""));
+            Message reply = FileShare.receiveMsg(main.fileShareClient.din);
+            if (reply.type == MessageType.SUCCESS) {
+                // Transmitting JTree object
+                ObjectInputStream ois = new ObjectInputStream(main.fileShareClient.din);
+                rmtFT = (JTree) ois.readObject();
+            } else {
+                JOptionPane.showMessageDialog(null, reply.body);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
 
         // Actions
         locFT.addTreeSelectionListener(new TreeSelectionListener() {
