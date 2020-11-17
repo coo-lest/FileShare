@@ -2,6 +2,8 @@ import com.sun.scenario.effect.impl.sw.java.JSWBoxBlurPeer;
 import javafx.scene.layout.Pane;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,8 +70,8 @@ public class LoginDialog extends JDialog {
         opPanel.add(loginBtn);
         opPanel.add(exitBtn);
 
-        container.add(hostPanel, BorderLayout.WEST);
-        container.add(opPanel, BorderLayout.EAST);
+        container.add(opPanel, BorderLayout.WEST);
+        container.add(hostPanel, BorderLayout.EAST);
 
         // Actions
         scanBtn.addActionListener(new ActionListener() {
@@ -100,6 +102,18 @@ public class LoginDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
+        });
+
+        hostList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                try {
+                    addressField.setText(main.fileShareClient.hostList.get(hostList.getSelectedIndex()).address.getHostAddress());
+                } catch (Exception ex) {
+                    // Ignore
+                }
+            }
+
         });
         this.setVisible(true);
     }
