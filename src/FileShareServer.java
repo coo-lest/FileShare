@@ -13,7 +13,7 @@ public class FileShareServer {
         System.out.println("Server created");
         svrSocket = new ServerSocket(tcpPort);
         udpSocket = new DatagramSocket(udpPort);
-        File sharedRoot = new File(rootPath);
+        sharedRoot = new File(rootPath);
 
         // Validate sharedRoot
         if (!sharedRoot.exists()) {
