@@ -11,7 +11,7 @@ public class FileShare {
     static Scanner scanner;
 
     public FileShare() throws IOException {
-        fileShareServer = new FileShareServer(SVR_TCP, SVR_UDP, "C:\\FileShare");  // TODO: read from config file
+        fileShareServer = new FileShareServer(SVR_TCP, SVR_UDP, "C:\\FileShare", this);  // TODO: read from config file
         fileShareClient = new FileShareClient();
         scanner = new Scanner(System.in);
     }

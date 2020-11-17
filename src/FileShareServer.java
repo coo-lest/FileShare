@@ -6,12 +6,14 @@ import java.util.zip.ZipOutputStream;
 
 public class FileShareServer {
 
+    FileShare main;  // Pointer to the main class
     ServerSocket svrSocket;
     DatagramSocket udpSocket;
     File sharedRoot;
 
-    public FileShareServer(int tcpPort, int udpPort, String rootPath) throws IOException {
+    public FileShareServer(int tcpPort, int udpPort, String rootPath, FileShare main) throws IOException {
         System.out.println("Server created");
+        this.main = main;
         svrSocket = new ServerSocket(tcpPort);
         udpSocket = new DatagramSocket(udpPort);
         sharedRoot = new File(rootPath);
@@ -50,6 +52,11 @@ public class FileShareServer {
                             String password = FileShare.receiveMsg(din).body;
                             // Verify
                             if (verifyUser(username, password)) {
+                                // Reject loopback login
+                                if (clSocket.getInetAddress().equals(main.fileShareClient.socket.getInetAddress())) {
+                                    FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Cannot login to local machine"));
+                                    return;
+                                }
                                 // Send success message
                                 FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Login successful"));
                                 // Start serving the client socket
