@@ -140,6 +140,10 @@ public class FileShare {
         }
     }
 
+    void gui() {
+        new GUI();
+    }
+
     private void login(String username, String address) throws IOException {
         fileShareClient.login(username, address);
     }
@@ -165,6 +169,7 @@ public class FileShare {
 
     public static void main(String[] args) throws Exception {
         FileShare fileShare = new FileShare();
-        fileShare.cli();
+//        fileShare.cli();
+        fileShare.gui();
     }
 }
