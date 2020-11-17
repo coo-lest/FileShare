@@ -131,24 +131,24 @@ public class FileShareServer {
                     break;
 
                 case DETAIL:
-                    detail(dout, cwd.getCanonicalPath() + File.separator + msg.body);  // msg.body is the filename
+                    detail(dout, cwd.getCanonicalPath() + File.separator + File.separator + msg.body);  // msg.body is the filename
                     break;
 
                 case RENAME:
                     String[] names = msg.body.split("/");  // names[0] == oldName, names[1] == newName
-                    rename(dout, cwd.getCanonicalPath() + names[0], cwd.getCanonicalPath() + names[1]);
+                    rename(dout, cwd.getCanonicalPath() + File.separator + names[0], cwd.getCanonicalPath() + File.separator + names[1]);
                     break;
 
                 case DELETE:
-                    deleteFile(dout, cwd.getCanonicalPath() + msg.body);
+                    deleteFile(dout, cwd.getCanonicalPath() + File.separator + msg.body);
                     break;
 
                 case RMDIR:
-                    deleteDirectory(dout, cwd.getCanonicalFile() + msg.body);
+                    deleteDirectory(dout, cwd.getCanonicalFile() + File.separator + msg.body);
                     break;
 
                 case CD:
-                    changeDir(dout, cwd.getCanonicalFile() + msg.body);
+                    changeDir(dout, cwd.getCanonicalFile() + File.separator + msg.body);
                     break;
 
             }
@@ -209,6 +209,7 @@ public class FileShareServer {
     }
 
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
+        System.out.println("del: " + file);
         // TODO: [AML] Check conditions (not exists, is a directory, etc..) and send FAILURE messages with corresponding body
         //  Do it with if conditions instead of try...catch here
         try {
@@ -221,6 +222,7 @@ public class FileShareServer {
 
     private void deleteDirectory(DataOutputStream dout, String file) throws IOException {
         // TODO: [AML] Check conditions (not exists, not empty, is a file, etc..) and send FAILURE messages with corresponding body
+        System.out.println("rmdir: " + file);
         new File(file).delete();
         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
     }
