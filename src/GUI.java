@@ -1,7 +1,13 @@
 import javafx.scene.layout.Pane;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import java.awt.*;
+import java.io.File;
 
 public class GUI extends JFrame {
     FileShare main;  // Pointer to main class
@@ -19,6 +25,8 @@ public class GUI extends JFrame {
     Button logoutBtn = new Button("Logout");
     TextField rmtPath = new TextField();
     TextField locPath = new TextField();
+    JTree rmtFT = new JTree();
+    JTree locFT = new JTree();
 
 
     public GUI(FileShare main) {
@@ -40,6 +48,7 @@ public class GUI extends JFrame {
         menuPanel.add(refBtn);
         menuPanel.add(logoutBtn);
 
+        // Remote panel
         serverPanel.setLayout(new BorderLayout());
         // Address bar
         Panel rmtAddBarPanel = new Panel();
@@ -48,8 +57,8 @@ public class GUI extends JFrame {
         rmtAddBarPanel.add(rmtAddBarLabel);
         rmtAddBarPanel.add(rmtPath);
         serverPanel.add(rmtAddBarPanel, BorderLayout.NORTH);
-        // File tree
 
+        // Local panel
         clientPanel.setLayout(new BorderLayout());
         // Address bar
         Panel locAddBarPanel = new Panel();
@@ -58,7 +67,6 @@ public class GUI extends JFrame {
         locAddBarPanel.add(locAddBarLabel);
         locAddBarPanel.add(locPath);
         clientPanel.add(locAddBarPanel, BorderLayout.NORTH);
-        // File tree
 
         container.add(menuPanel, BorderLayout.NORTH);
         Panel filePanel = new Panel();
@@ -67,12 +75,84 @@ public class GUI extends JFrame {
         filePanel.add(clientPanel);
         container.add(filePanel, BorderLayout.CENTER);
 
+
         this.setVisible(true);
         JDialog loginDialog = new LoginDialog(this, "Login", true, main);
+        loadTrees();
+
     }
 
 
+    /*
+      Returns a JTree representing the file structure
+     */
+    static JTree buildTree(File rootFile) {
+        FileNode rootNode = new FileNode(rootFile);
+        createChildren(rootFile, rootNode);
+        DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
 
+        JTree tree = new JTree(treeModel);
+        return tree;
+    }
 
+    static void createChildren(File rootFile, DefaultMutableTreeNode node) {
+        File[] files = rootFile.listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            DefaultMutableTreeNode childNode =
+                    new DefaultMutableTreeNode(new FileNode(file));
+            node.add(childNode);
+            if (file.isDirectory()) {
+                createChildren(file, childNode);
+            }
+        }
+    }
+
+    void loadTrees() {
+        // File tree
+        // Reload local tree
+        locFT = buildTree(new File("."));  // TODO: set download path
+        // Fetch remote tree
+
+        // Actions
+        locFT.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode slctNode = (DefaultMutableTreeNode) ((JTree) e.getSource()).getLastSelectedPathComponent();
+                TreeNode[] nodes = slctNode.getPath();
+                String filepath = "";
+                for (int i = 0; i < nodes.length - 1; i++) {
+                    filepath += nodes[i].toString() + File.separator;
+                }
+                if (nodes.length != 0) {
+                    filepath += nodes[nodes.length - 1].toString();
+                }
+
+                locPath.setText(filepath);
+            }
+        });
+
+        rmtFT.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode slctNode = (DefaultMutableTreeNode) ((JTree) e.getSource()).getLastSelectedPathComponent();
+                TreeNode[] nodes = slctNode.getPath();
+                String filepath = "";
+                for (int i = 0; i < nodes.length - 1; i++) {
+                    filepath += nodes[i].toString() + File.separator;
+                }
+                if (nodes.length != 0) {
+                    filepath += nodes[nodes.length - 1].toString();
+                }
+
+                rmtPath.setText(filepath);
+            }
+        });
+
+        clientPanel.add(locFT, BorderLayout.CENTER);
+        serverPanel.add(rmtFT, BorderLayout.CENTER);
+        this.setVisible(true);
+    }
 
 }
