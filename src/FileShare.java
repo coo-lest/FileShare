@@ -141,7 +141,7 @@ public class FileShare {
     }
 
     void gui() {
-        new GUI();
+        new GUI(this);
     }
 
     private void login(String username, String address) throws IOException {

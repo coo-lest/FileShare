@@ -37,6 +37,26 @@ public class FileShareClient {
 
     }
 
+    Message login(String username, String address, String password) throws IOException {
+        svrIp = address;
+        socket = new Socket(svrIp, svrPort);
+        din = new DataInputStream(socket.getInputStream());
+        dout = new DataOutputStream(socket.getOutputStream());
+
+        FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
+        // Wait for request for password
+        System.out.print(FileShare.receiveMsg(din).body);
+
+        // Get and send password
+        FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
+
+        // Wait for authentication
+        Message authRes = FileShare.receiveMsg(din);
+
+        return authRes;
+
+    }
+
     void login(String username, String address) {
         try {
             svrIp = address;
