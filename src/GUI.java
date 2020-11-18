@@ -275,6 +275,19 @@ public class GUI extends JFrame {
         renameDialog.add(btn);
         renameDialog.setVisible(true);
 
+        btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String path = relativePath(rmtPath.getText());
+                    main.fileShareClient.rename(path, tf.getName());  // TODO: incorporate Anmol's code
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+                renameDialog.dispose();
+                loadTrees();
+            }
+        });
     }
 
     void detail() {
