@@ -264,6 +264,16 @@ public class GUI extends JFrame {
     }
 
     void rename() {
+        Dialog renameDialog = new Dialog(this, "Rename");
+        renameDialog.setSize(new Dimension(200, 100));
+        renameDialog.setLayout(new GridLayout(3, 1));
+        TextField tf = new TextField();
+        Label lb = new Label("New name:");
+        Button btn = new Button("Confirm");
+        renameDialog.add(lb);
+        renameDialog.add(tf);
+        renameDialog.add(btn);
+        renameDialog.setVisible(true);
 
     }
 
