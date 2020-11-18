@@ -272,8 +272,8 @@ public class GUI extends JFrame {
     void download() {
         String path = relativePath(rmtPath.getText());
         try {
-            main.fileShareClient.delete(path);
-            main.fileShareClient.rmdir(path);
+            main.fileShareClient.download(path, locWorkDir.getCanonicalPath() + relativePath(locPath.getText()));
+            loadTrees();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }

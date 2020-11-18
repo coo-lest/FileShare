@@ -120,6 +120,7 @@ public class LoginDialog extends JDialog {
             Message authRes = main.fileShareClient.login(username, address, password);
             if (authRes.type == MessageType.SUCCESS) {
                 JOptionPane.showMessageDialog(null, "Login successful");
+                main.fileShareClient.isConnected = true;
                 thisDialog.dispose();
             } else {
                 JOptionPane.showMessageDialog(null, authRes.body);
