@@ -222,7 +222,7 @@ public class FileShareClient {
         }
     }
 
-    void detail(String filename) throws IOException {
+    String detail(String filename) throws IOException {
         FileShare.sendMsg(dout, new Message(MessageType.DETAIL, filename));
         Message res = FileShare.receiveMsg(din);
         if (res.type == MessageType.SUCCESS) {
@@ -230,6 +230,7 @@ public class FileShareClient {
         } else {
             System.out.println(res.body);
         }
+        return res.body;
     }
 
     void rename(String oldName, String newName) throws IOException {

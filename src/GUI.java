@@ -193,13 +193,21 @@ public class GUI extends JFrame {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode slctNode = (DefaultMutableTreeNode) ((JTree) e.getSource()).getLastSelectedPathComponent();
-                TreeNode[] nodes = slctNode.getPath();
-                String filepath = "";
-                for (int i = 0; i < nodes.length - 1; i++) {
-                    filepath += nodes[i].toString() + File.separator;
+                TreeNode[] nodes = null;
+                try {
+                    nodes = slctNode.getPath();
+                } catch (Exception e1) {
+                    // Ignore
                 }
-                if (nodes.length != 0) {
-                    filepath += nodes[nodes.length - 1].toString();
+                // Update path in the textfield
+                String filepath = "";
+                if (nodes != null) {
+                    for (int i = 0; i < nodes.length - 1; i++) {
+                        filepath += nodes[i].toString() + File.separator;
+                    }
+                    if (nodes.length != 0) {
+                        filepath += nodes[nodes.length - 1].toString();
+                    }
                 }
 
                 locPath.setText(filepath);
@@ -210,13 +218,21 @@ public class GUI extends JFrame {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode slctNode = (DefaultMutableTreeNode) ((JTree) e.getSource()).getLastSelectedPathComponent();
-                TreeNode[] nodes = slctNode.getPath();
-                String filepath = "";
-                for (int i = 0; i < nodes.length - 1; i++) {
-                    filepath += nodes[i].toString() + File.separator;
+                TreeNode[] nodes = null;
+                try {
+                    nodes = slctNode.getPath();
+                } catch (Exception e1) {
+                    // Ignore
                 }
-                if (nodes.length != 0) {
-                    filepath += nodes[nodes.length - 1].toString();
+                // Update path in the textfield
+                String filepath = "";
+                if (nodes != null) {
+                    for (int i = 0; i < nodes.length - 1; i++) {
+                        filepath += nodes[i].toString() + File.separator;
+                    }
+                    if (nodes.length != 0) {
+                        filepath += nodes[nodes.length - 1].toString();
+                    }
                 }
 
                 rmtPath.setText(filepath);
@@ -242,7 +258,7 @@ public class GUI extends JFrame {
             main.fileShareClient.delete(path);
             main.fileShareClient.rmdir(path);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
         loadTrees();
     }
@@ -252,6 +268,13 @@ public class GUI extends JFrame {
     }
 
     void detail() {
+        String path = relativePath(rmtPath.getText());
+        try {
+            String detail = main.fileShareClient.detail(path);
+            JOptionPane.showMessageDialog(null, detail);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
 
     }
 
