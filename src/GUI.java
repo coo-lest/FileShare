@@ -305,8 +305,8 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-
-                    main.fileShareClient.mkdir(tf.getText());
+                    String path = relativePath(rmtPath.getText());
+                    main.fileShareClient.mkdir(path + File.separator + tf.getText());
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
