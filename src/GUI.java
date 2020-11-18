@@ -168,6 +168,8 @@ public class GUI extends JFrame {
     }
 
     void loadTrees() {
+        clientPanel.remove(locFT);
+        serverPanel.remove(rmtFT);
         // File tree
         // Reload local tree
         locFT = buildTree(new File("."));  // TODO: set download path
@@ -235,7 +237,14 @@ public class GUI extends JFrame {
     }
 
     void delete() {
-
+        String path = relativePath(rmtPath.getText());
+        try {
+            main.fileShareClient.delete(path);
+            main.fileShareClient.rmdir(path);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        loadTrees();
     }
 
     void rename() {
@@ -280,5 +289,10 @@ public class GUI extends JFrame {
 
     void logout() {
 
+    }
+
+    private String relativePath(String str) {
+        String root = str.split("\\\\")[0];
+        return str.replaceFirst(root, ".");
     }
 }
