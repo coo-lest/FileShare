@@ -266,6 +266,14 @@ public class GUI extends JFrame {
     }
 
     void upload() {
+        String path = relativePath(rmtPath.getText());
+        try {
+            System.out.println(locWorkDir.getCanonicalPath() + relativePath(locPath.getText()));
+            main.fileShareClient.upload(locWorkDir.getCanonicalPath() + relativePath(locPath.getText()), path);
+            loadTrees();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
 
     }
 
