@@ -25,10 +25,13 @@ public class GUI extends JFrame {
     Button mkdirBtn = new Button("New Folder");
     Button refBtn = new Button("Refresh");
     Button logoutBtn = new Button("Logout");
+    Button goBtn = new Button("Go");
+    Button backBtn = new Button("Back");
     TextField rmtPath = new TextField();
     TextField locPath = new TextField();
     JTree rmtFT = new JTree();
     JTree locFT = new JTree();
+    File locWorkDir = new File(".");
 
 
     public GUI(FileShare main) {
@@ -64,10 +67,14 @@ public class GUI extends JFrame {
         clientPanel.setLayout(new BorderLayout());
         // Address bar
         Panel locAddBarPanel = new Panel();
-        locAddBarPanel.setLayout(new GridLayout(1, 2));
+        locAddBarPanel.setLayout(new GridLayout(1, 3));
         Label locAddBarLabel = new Label("Local Path: ");
         locAddBarPanel.add(locAddBarLabel);
         locAddBarPanel.add(locPath);
+        Panel navPanel = new Panel(new GridLayout(1, 2));
+        navPanel.add(goBtn);
+        navPanel.add(backBtn);
+        locAddBarPanel.add(navPanel);
         clientPanel.add(locAddBarPanel, BorderLayout.NORTH);
 
         container.add(menuPanel, BorderLayout.NORTH);
@@ -134,6 +141,20 @@ public class GUI extends JFrame {
             }
         });
 
+        goBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                go();
+            }
+        });
+
+        backBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                back();
+            }
+        });
+
         this.setVisible(true);
         JDialog loginDialog = new LoginDialog(this, "Login", true, main);
         loadTrees();
@@ -172,7 +193,7 @@ public class GUI extends JFrame {
         serverPanel.remove(rmtFT);
         // File tree
         // Reload local tree
-        locFT = buildTree(new File("."));  // TODO: set download path
+        locFT = buildTree(locWorkDir);  // TODO: set download path
         // Fetch remote tree
         try {
             FileShare.sendMsg(main.fileShareClient.dout, new Message(MessageType.TREE, ""));
@@ -249,6 +270,13 @@ public class GUI extends JFrame {
     }
 
     void download() {
+        String path = relativePath(rmtPath.getText());
+        try {
+            main.fileShareClient.delete(path);
+            main.fileShareClient.rmdir(path);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
 
     }
 
@@ -335,6 +363,16 @@ public class GUI extends JFrame {
 
     void logout() {
 
+    }
+
+    void go() {
+        locWorkDir = new File(locPath.getText());
+        loadTrees();
+    }
+
+    void back() {
+        locWorkDir = new File("..");
+        loadTrees();
     }
 
     private String relativePath(String str) {
