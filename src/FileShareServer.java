@@ -53,7 +53,8 @@ public class FileShareServer {
                             // Verify
                             if (verifyUser(username, password)) {
                                 // Reject loopback login
-                                if (clSocket.getInetAddress().equals(main.fileShareClient.socket.getInetAddress())) {
+                                if (main.fileShareClient.socket != null &&
+                                        clSocket.getInetAddress().equals(main.fileShareClient.socket.getInetAddress())) {
                                     FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Cannot login to local machine"));
                                     return;
                                 }
