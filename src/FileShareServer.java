@@ -316,8 +316,8 @@ public class FileShareServer {
     private void sendTree(DataOutputStream dout) throws IOException {
         try {
             JTree tree = GUI.buildTree(sharedRoot);
-            ObjectOutputStream oos = new ObjectOutputStream(dout);
             FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start tree transmission"));
+            ObjectOutputStream oos = new ObjectOutputStream(dout);
             oos.writeObject(tree);
         } catch (Exception e) {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
