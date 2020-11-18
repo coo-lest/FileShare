@@ -5,6 +5,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -75,6 +77,62 @@ public class GUI extends JFrame {
         filePanel.add(clientPanel);
         container.add(filePanel, BorderLayout.CENTER);
 
+        // Button actions
+        upBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                upload();
+            }
+        });
+
+        downBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                download();
+            }
+        });
+
+        delBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                delete();
+            }
+        });
+
+        rnBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                rename();
+            }
+        });
+
+        detBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detail();
+            }
+        });
+
+        mkdirBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mkdir();
+            }
+        });
+
+        refBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refresh();
+            }
+        });
+
+        logoutBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logout();
+            }
+        });
 
         this.setVisible(true);
         JDialog loginDialog = new LoginDialog(this, "Login", true, main);
@@ -168,4 +226,59 @@ public class GUI extends JFrame {
         this.setVisible(true);
     }
 
+    void upload() {
+
+    }
+
+    void download() {
+
+    }
+
+    void delete() {
+
+    }
+
+    void rename() {
+
+    }
+
+    void detail() {
+
+    }
+
+    void mkdir() {
+        Dialog dirNameDialog = new Dialog(this, "Folder name");
+        dirNameDialog.setSize(new Dimension(200, 100));
+        dirNameDialog.setLayout(new GridLayout(3, 1));
+        TextField tf = new TextField();
+        Label lb = new Label("Folder name: ");
+        Button btn = new Button("Confirm");
+        dirNameDialog.add(lb);
+        dirNameDialog.add(tf);
+        dirNameDialog.add(btn);
+        dirNameDialog.setVisible(true);
+        tf.setText("New Folder");
+
+        btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+
+                    main.fileShareClient.mkdir(tf.getText());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+                dirNameDialog.dispose();
+                loadTrees();
+            }
+        });
+    }
+
+    void refresh() {
+        loadTrees();
+    }
+
+    void logout() {
+
+    }
 }
