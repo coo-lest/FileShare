@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
@@ -168,7 +169,7 @@ public class GUI extends JFrame {
     static JTree buildTree(File rootFile) {
         FileNode rootNode = new FileNode(rootFile);
         createChildren(rootFile, rootNode);
-        DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
+        DefaultTreeModel treeModel = new DefaultTreeModel(rootNode, true);
 
         JTree tree = new JTree(treeModel);
         return tree;
@@ -180,7 +181,7 @@ public class GUI extends JFrame {
 
         for (File file : files) {
             DefaultMutableTreeNode childNode =
-                    new DefaultMutableTreeNode(new FileNode(file));
+                    new DefaultMutableTreeNode(new FileNode(file), file.isDirectory());
             node.add(childNode);
             if (file.isDirectory()) {
                 createChildren(file, childNode);
