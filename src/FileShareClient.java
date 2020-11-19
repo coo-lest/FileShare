@@ -233,12 +233,13 @@ public class FileShareClient {
         return res.body;
     }
 
-    void rename(String oldName, String newName) throws IOException {
+    Message rename(String oldName, String newName) throws IOException {
         FileShare.sendMsg(dout, new Message(MessageType.RENAME, oldName + "\\?" + newName));
         Message res = FileShare.receiveMsg(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
+        return res;
     }
 
     void delete(String filename) throws IOException {
