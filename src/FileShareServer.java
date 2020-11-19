@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.util.zip.ZipOutputStream;
 
 public class FileShareServer {
 
@@ -186,7 +185,8 @@ public class FileShareServer {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
             return;
         } else if (f.isDirectory()) {
-            f = zipDir(f);
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Cannot send directory"));
+            return;
         }
         // Start file transmission
         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
@@ -202,11 +202,6 @@ public class FileShareServer {
             fSize -= read;
         }
 
-    }
-
-    private File zipDir(File dir) {
-        File zip = new File("./tmp.zip");
-        return zip;
     }
 
     private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws
@@ -245,12 +240,25 @@ public class FileShareServer {
         }
     }
 
-    private void deleteDirectory(DataOutputStream dout, String file) throws IOException {
-        // TODO: [AML] Check conditions (not exists, not empty, is a file, etc..) and send FAILURE messages with corresponding body
-        System.out.println("rmdir: " + file);
-        new File(file).delete();
+    private void deleteDirectory(DataOutputStream dout, String filename) throws IOException {
+        File file = new File(filename);
+        if (file.isFile()) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "This is not a directory"));
+        }
+        deleteDirectory(file);
         FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
     }
+
+    private boolean deleteDirectory(File dir) {
+        File[] allContents = dir.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return dir.delete();
+    }
+
 
     private void rename(DataOutputStream dout, String fname, String newfname) throws IOException {
         // TODO: [AML] Similarly, condition check
