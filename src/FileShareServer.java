@@ -119,6 +119,7 @@ public class FileShareServer {
             while (!Thread.currentThread().isInterrupted()) {
                 // Get request type
                 Message msg = FileShare.receiveMsg(din);
+
                 switch (msg.type) {
                     case DOWNLOAD:
                         String filename = msg.body;
@@ -145,7 +146,7 @@ public class FileShareServer {
                         break;
 
                     case RENAME:
-                        String[] names = msg.body.split("/");  // names[0] == oldName, names[1] == newName
+                        String[] names = msg.body.split("\\?");  // names[0] == oldName, names[1] == newName
                         rename(dout, cwd.getCanonicalPath() + File.separator + names[0], cwd.getCanonicalPath() + File.separator + names[1]);
                         break;
 
@@ -225,6 +226,7 @@ public class FileShareServer {
         }
         byte[] buffer = new byte[1024];
         long fSize = din.readLong();
+        System.out.println(fSize);
         while (fSize > 0) {
             int read = din.read(buffer);
             fout.write(buffer, 0, read);
