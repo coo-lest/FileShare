@@ -155,7 +155,7 @@ public class FileShareClient {
         // If transmission can be started
         if (reply.type == MessageType.SUCCESS) {
             // Create directories and file
-            File f = new File(savePath, filename);
+            File f = new File(savePath, new File(filename).getName());
             File dir = f.getParentFile();
             dir.mkdirs();
             // TODO: check duplicated filename
