@@ -1,5 +1,6 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -11,7 +12,13 @@ public class FileShare {
     static Scanner scanner;
 
     public FileShare() throws IOException {
-        fileShareServer = new FileShareServer(SVR_TCP, SVR_UDP, "C:\\FileShare", this);  // TODO: read from config file
+        File rootConfig = new File("share_root");
+        if (!rootConfig.isFile()) {
+            System.out.println("Missing share_root file");
+        }
+        Scanner fs = new Scanner(rootConfig);
+        String root = fs.nextLine();
+        fileShareServer = new FileShareServer(SVR_TCP, SVR_UDP, root, this);
         fileShareClient = new FileShareClient();
         scanner = new Scanner(System.in);
     }
