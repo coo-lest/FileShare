@@ -316,7 +316,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String path = relativePath(rmtPath.getText());
-                    main.fileShareClient.rename(path, tf.getName());  // TODO: incorporate Anmol's code
+                    main.fileShareClient.rename(path, new File(path).getParent() + File.separator + tf.getText());  // TODO: incorporate Anmol's code
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
