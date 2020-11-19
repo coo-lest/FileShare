@@ -370,7 +370,13 @@ public class GUI extends JFrame {
     }
 
     void logout() {
-
+        try {
+            main.fileShareClient.socket.close();
+        } catch (Exception e) {
+            // Ignore
+        }
+        main.fileShareClient.isConnected = false;
+        JDialog loginDialog = new LoginDialog(this, "Login", true, main);
     }
 
     void go() {
