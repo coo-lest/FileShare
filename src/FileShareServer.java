@@ -108,63 +108,68 @@ public class FileShareServer {
     }
 
     private void serve(Socket clSocket) throws IOException {
-        System.out.printf("Established a connection to host %s:%d\n\n", clSocket.getInetAddress(),
-                clSocket.getPort());
-        File cwd = new File(sharedRoot.getCanonicalPath());
-        // Get stream
-        DataInputStream din = new DataInputStream(clSocket.getInputStream());
-        DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
+        try {
+            System.out.printf("Established a connection to host %s:%d\n\n", clSocket.getInetAddress(),
+                    clSocket.getPort());
+            File cwd = new File(sharedRoot.getCanonicalPath());
+            // Get stream
+            DataInputStream din = new DataInputStream(clSocket.getInputStream());
+            DataOutputStream dout = new DataOutputStream(clSocket.getOutputStream());
 
-        while (true) {
-            // Get request type
-            Message msg = FileShare.receiveMsg(din);
-            switch (msg.type) {
-                case DOWNLOAD:
-                    String filename = msg.body;
-                    sendFile(dout, cwd.getCanonicalPath() + File.separator + filename);
-                    break;
+            while (!Thread.currentThread().isInterrupted()) {
+                // Get request type
+                Message msg = FileShare.receiveMsg(din);
+                switch (msg.type) {
+                    case DOWNLOAD:
+                        String filename = msg.body;
+                        sendFile(dout, cwd.getCanonicalPath() + File.separator + filename);
+                        break;
 
-                case UPLOAD:
-                    String filenameWithPath = msg.body;
-                    receiveFile(din, dout, cwd.getCanonicalPath() + File.separator + filenameWithPath);
-                    break;
+                    case UPLOAD:
+                        String filenameWithPath = msg.body;
+                        receiveFile(din, dout, cwd.getCanonicalPath() + File.separator + filenameWithPath);
+                        break;
 
-                case MKDIR:
-                    String dirName = msg.body;
-                    try {
-                        makeDirectory(cwd.getCanonicalPath(), dirName);
-                        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
-                    } catch (Exception e) {
-                        FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
-                    }
-                    break;
+                    case MKDIR:
+                        String dirName = msg.body;
+                        try {
+                            makeDirectory(cwd.getCanonicalPath(), dirName);
+                            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+                        } catch (Exception e) {
+                            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+                        }
+                        break;
 
-                case DETAIL:
-                    detail(dout, cwd.getCanonicalPath() + File.separator + File.separator + msg.body);  // msg.body is the filename
-                    break;
+                    case DETAIL:
+                        detail(dout, cwd.getCanonicalPath() + File.separator + File.separator + msg.body);  // msg.body is the filename
+                        break;
 
-                case RENAME:
-                    String[] names = msg.body.split("/");  // names[0] == oldName, names[1] == newName
-                    rename(dout, cwd.getCanonicalPath() + File.separator + names[0], cwd.getCanonicalPath() + File.separator + names[1]);
-                    break;
+                    case RENAME:
+                        String[] names = msg.body.split("/");  // names[0] == oldName, names[1] == newName
+                        rename(dout, cwd.getCanonicalPath() + File.separator + names[0], cwd.getCanonicalPath() + File.separator + names[1]);
+                        break;
 
-                case DELETE:
-                    deleteFile(dout, cwd.getCanonicalPath() + File.separator + msg.body);
-                    break;
+                    case DELETE:
+                        deleteFile(dout, cwd.getCanonicalPath() + File.separator + msg.body);
+                        break;
 
-                case RMDIR:
-                    deleteDirectory(dout, cwd.getCanonicalFile() + File.separator + msg.body);
-                    break;
+                    case RMDIR:
+                        deleteDirectory(dout, cwd.getCanonicalFile() + File.separator + msg.body);
+                        break;
 
-                case CD:
-                    changeDir(dout, cwd.getCanonicalFile() + File.separator + msg.body);
-                    break;
+                    case CD:
+                        changeDir(dout, cwd.getCanonicalFile() + File.separator + msg.body);
+                        break;
 
-                case TREE:
-                    sendTree(dout);
-                    break;
+                    case TREE:
+                        sendTree(dout);
+                        break;
 
+                }
             }
+        } catch (SocketException e) {
+            // Client dropped
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -205,20 +210,25 @@ public class FileShareServer {
 
     private void receiveFile(DataInputStream din, DataOutputStream dout, String filenameWithPath) throws
             IOException {
-        // Create directories and file
-        File f = new File(filenameWithPath);
-        File dir = f.getParentFile();
-        dir.mkdirs();
-        // Start transmission
-        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
-        FileOutputStream fout = new FileOutputStream(f);
+        FileOutputStream fout = null;
+        try {
+            // Create directories and file
+            File f = new File(filenameWithPath);
+            File dir = f.getParentFile();
+            dir.mkdirs();
+            // Start transmission
+            fout = new FileOutputStream(f);
+            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        } catch (Exception e) {
+            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+            return;
+        }
         byte[] buffer = new byte[1024];
         long fSize = din.readLong();
         while (fSize > 0) {
             int read = din.read(buffer);
             fout.write(buffer, 0, read);
-            fSize -= read;
-        }
+            fSize -= read; }
     }
 
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
