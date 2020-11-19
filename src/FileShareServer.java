@@ -261,9 +261,12 @@ public class FileShareServer {
 
 
     private void rename(DataOutputStream dout, String fname, String newfname) throws IOException {
-        // TODO: [AML] Similarly, condition check
         try {
             File new_fname = new File(newfname);
+            if (new_fname.exists()) {
+                FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File/Folder with the same name exists"));
+                return;
+            }
             new File(fname).renameTo(new_fname);
             FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
         } catch (Exception e) {
