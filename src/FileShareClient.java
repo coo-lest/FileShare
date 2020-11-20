@@ -19,24 +19,6 @@ public class FileShareClient {
     DataOutputStream dout;
     List<Host> hostList = new LinkedList<>();
 
-    public FileShareClient() throws IOException {
-        System.out.println("Client created");
-
-//        Thread dinThread = new Thread(() -> {
-//            while (true) {
-//                byte[] buffer = new byte[1024];
-//                try {
-//                    din.read(buffer);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                System.out.print(new String(buffer));
-//            }
-//        });
-//        dinThread.start();
-
-    }
-
     Message login(String username, String address, String password) throws IOException {
         svrIp = address;
         socket = new Socket(svrIp, svrPort);
