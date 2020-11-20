@@ -32,6 +32,8 @@ public class GUI extends JFrame {
     TextField locPath = new TextField();
     JTree rmtFT = new JTree();
     JTree locFT = new JTree();
+    ScrollPane rmtScroll = new ScrollPane();
+    ScrollPane locScroll = new ScrollPane();
     File locWorkDir = new File(".");
 
 
@@ -63,6 +65,7 @@ public class GUI extends JFrame {
         rmtAddBarPanel.add(rmtAddBarLabel);
         rmtAddBarPanel.add(rmtPath);
         serverPanel.add(rmtAddBarPanel, BorderLayout.NORTH);
+        serverPanel.add(rmtScroll);
 
         // Local panel
         clientPanel.setLayout(new BorderLayout());
@@ -77,6 +80,7 @@ public class GUI extends JFrame {
         navPanel.add(backBtn);
         locAddBarPanel.add(navPanel);
         clientPanel.add(locAddBarPanel, BorderLayout.NORTH);
+        clientPanel.add(locScroll);
 
         container.add(menuPanel, BorderLayout.NORTH);
         Panel filePanel = new Panel();
@@ -190,8 +194,8 @@ public class GUI extends JFrame {
     }
 
     void loadTrees() {
-        clientPanel.remove(locFT);
-        serverPanel.remove(rmtFT);
+        locScroll.remove(locFT);
+        rmtScroll.remove(rmtFT);
         // File tree
         // Reload local tree
         locFT = buildTree(locWorkDir);  // TODO: set download path
@@ -261,8 +265,8 @@ public class GUI extends JFrame {
             }
         });
 
-        clientPanel.add(locFT, BorderLayout.CENTER);
-        serverPanel.add(rmtFT, BorderLayout.CENTER);
+        locScroll.add(locFT, BorderLayout.CENTER);
+        rmtScroll.add(rmtFT, BorderLayout.CENTER);
         this.setVisible(true);
     }
 
