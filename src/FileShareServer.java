@@ -76,7 +76,7 @@ public class FileShareServer {
 
         // Create UDP listening thread
         Thread udpListen = new Thread(() -> {
-            while (true) {  // TODO: isDiscoverable
+            while (true) {
                 try {
                     System.out.println("Waiting for UDP connection");
                     Object[] udpRcvd = Message.udpReceive(udpSocket);  // {Message, InetAddress, int}
@@ -170,7 +170,6 @@ public class FileShareServer {
 
 
     private void makeDirectory(String path, String dirName) throws Exception {
-        // TODO: [AML] Check conditions to avoid possible exceptions
         new File(path, dirName).mkdirs();
     }
 
@@ -226,8 +225,6 @@ public class FileShareServer {
 
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
         System.out.println("del: " + file);
-        // TODO: [AML] Check conditions (not exists, is a directory, etc..) and send FAILURE messages with corresponding body
-        //  Do it with if conditions instead of try...catch here
         try {
             new File(file).delete();
             FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
@@ -273,7 +270,6 @@ public class FileShareServer {
 
     private void detail(DataOutputStream dout, String filename) throws IOException {
         File file = new File(filename);
-        // TODO: [AML] Nothing to do here. This is an example of condition check
         if (!file.exists()) {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exists"));
         }

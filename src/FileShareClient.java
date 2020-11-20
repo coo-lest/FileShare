@@ -158,7 +158,6 @@ public class FileShareClient {
             File f = new File(savePath, new File(filename).getName());
             File dir = f.getParentFile();
             dir.mkdirs();
-            // TODO: check duplicated filename
             // Start transmission
             FileOutputStream fout = new FileOutputStream(f);
             byte[] buffer = new byte[1024];
@@ -189,7 +188,6 @@ public class FileShareClient {
         } else if (f.isDirectory()) {
             System.out.println(filename + " is a directory");
             return;
-            // TODO: add directory support
         }
 
         // Send UPLOAD request

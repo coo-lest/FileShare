@@ -200,7 +200,7 @@ public class GUI extends JFrame {
         rmtScroll.remove(rmtFT);
         // File tree
         // Reload local tree
-        locFT = buildTree(locWorkDir);  // TODO: set download path
+        locFT = buildTree(locWorkDir);
         // Fetch remote tree
         try {
             FileShare.sendMsg(main.fileShareClient.dout, new Message(MessageType.TREE, ""));
@@ -324,7 +324,7 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String path = relativePath(rmtPath.getText());
-                    Message res = main.fileShareClient.rename(path, new File(path).getParent() + File.separator + tf.getText());  // TODO: incorporate Anmol's code
+                    Message res = main.fileShareClient.rename(path, new File(path).getParent() + File.separator + tf.getText());
                     if (res.type != MessageType.SUCCESS) {
                         JOptionPane.showMessageDialog(null, res.body);
                         renameDialog.dispose();

@@ -73,7 +73,6 @@ public class FileShare {
                         break;
                     }
 
-                    // TODO: support whitespace in the path
                     String filename = cmd[1];
                     fileShareClient.download(filename, "./Downloads");
                     break;
@@ -83,7 +82,7 @@ public class FileShare {
                         System.out.println("Invalid number of argument");
                         break;
                     }
-                    // TODO: support whitespace in the path
+
                     String upFname = cmd[1];
                     fileShareClient.upload(upFname, "./Upload");
                     break;
