@@ -216,12 +216,11 @@ public class FileShareServer {
         }
         byte[] buffer = new byte[1024];
         long fSize = din.readLong();
-        System.out.println(fSize);
         while (fSize > 0) {
-            int read = din.read(buffer);
+            int read = din.read(buffer, 0, Math.min(((int) fSize), buffer.length));
             fout.write(buffer, 0, read);
-            fSize -= read; }
-
+            fSize -= read;
+        }
         fout.close();
     }
 
