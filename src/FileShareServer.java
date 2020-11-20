@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class FileShareServer {
@@ -273,6 +274,7 @@ public class FileShareServer {
         if (!file.exists()) {
             FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exists"));
         }
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         String detailStr = "";
         detailStr += ("name : " + file.getName() + "\n");
@@ -282,7 +284,7 @@ public class FileShareServer {
         detailStr += ("hidden? : " + file.isHidden() + "\n");
         detailStr += ("dir? : " + file.isDirectory() + "\n");
         detailStr += ("file? : " + file.isFile() + "\n");
-        detailStr += ("modified (timestamp) : " + file.lastModified() + "\n");
+        detailStr += ("modified (timestamp) : " + sdf.format(file.lastModified()) + "\n");
         detailStr += ("readable? : " + file.canRead() + "\n");
         detailStr += ("writable? : " + file.canWrite() + "\n");
         detailStr += ("executable? : " + file.canExecute() + "\n");
