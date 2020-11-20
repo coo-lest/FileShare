@@ -168,6 +168,7 @@ public class FileShareClient {
                 fout.write(buffer, 0, read);
                 fSize -= read;
             }
+            fout.close();
         } else {
             System.out.println(reply.body);
         }

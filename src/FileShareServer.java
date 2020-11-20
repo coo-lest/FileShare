@@ -221,6 +221,8 @@ public class FileShareServer {
             int read = din.read(buffer);
             fout.write(buffer, 0, read);
             fSize -= read; }
+
+        fout.close();
     }
 
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
@@ -323,8 +325,9 @@ public class FileShareServer {
                     if (userInfo[0].equals(username) && userInfo[1].equals(password)) {
                         return true;
                     }
+                    fin.close();
                 }
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
