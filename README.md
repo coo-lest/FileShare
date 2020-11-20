@@ -21,13 +21,17 @@ The developers admit that this is not a robust program. Use with care!
 
 Here are some known issues:
 * **Upload/Download/NewFolder to a *File* (instead of a Folder) will cause problem**  
-Just make sure you select a *folder* as the destination.
+Just make sure you select a *folder* as the destination.  
+This may also cause unpredicted problems in subsequent operations!  
+
 * **Error may prompt when login to hosts in *another network***  
 Due to some problem with the class `ObjectOutputStream`, bytes of an object may
 alter when transferred across networks (according to Mandel). This can be solved
 by adopting similar transmission protocol as that in the `Message` class, i.e.
 serializing the object and transmitting bytes(not implemented due to time limitation).  
+
 * **Files with the same name will be overwritten**  
 The developer is also a victim of this when writing this documentation.
+
 * **Folder with the same name will prevent uploading without any notification**  
-... while the same situation for download triggers a prompt.
+... while the same situation for download triggers a prompt.  
