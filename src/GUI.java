@@ -63,6 +63,7 @@ public class GUI extends JFrame {
         rmtAddBarPanel.setLayout(new GridLayout(1, 2));
         Label rmtAddBarLabel = new Label("Remote Path: ");
         rmtAddBarPanel.add(rmtAddBarLabel);
+        rmtPath.setEditable(false);
         rmtAddBarPanel.add(rmtPath);
         serverPanel.add(rmtAddBarPanel, BorderLayout.NORTH);
         serverPanel.add(rmtScroll);
@@ -74,6 +75,7 @@ public class GUI extends JFrame {
         locAddBarPanel.setLayout(new GridLayout(1, 3));
         Label locAddBarLabel = new Label("Local Path: ");
         locAddBarPanel.add(locAddBarLabel);
+        locPath.setEditable(false);
         locAddBarPanel.add(locPath);
         Panel navPanel = new Panel(new GridLayout(1, 2));
         navPanel.add(goBtn);
