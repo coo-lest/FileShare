@@ -305,7 +305,8 @@ public class GUI extends JFrame {
     }
 
     void rename() {
-        Dialog renameDialog = new Dialog(this, "Rename");
+        JDialog renameDialog = new JDialog(this, "Rename");
+        renameDialog.setLocationRelativeTo(this);
         renameDialog.setSize(new Dimension(200, 100));
         renameDialog.setLayout(new GridLayout(3, 1));
         TextField tf = new TextField();
@@ -348,7 +349,8 @@ public class GUI extends JFrame {
     }
 
     void mkdir() {
-        Dialog dirNameDialog = new Dialog(this, "Folder name");
+        JDialog dirNameDialog = new JDialog(this, "Folder name");
+        dirNameDialog.setLocationRelativeTo(this);
         dirNameDialog.setSize(new Dimension(200, 100));
         dirNameDialog.setLayout(new GridLayout(3, 1));
         TextField tf = new TextField();
@@ -387,6 +389,7 @@ public class GUI extends JFrame {
         }
         main.fileShareClient.isConnected = false;
         JDialog loginDialog = new LoginDialog(this, "Login", true, main);
+        refresh();
     }
 
     void go() {
