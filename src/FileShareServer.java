@@ -51,12 +51,7 @@ public class FileShareServer {
                             String password = FileShare.receiveMsg(din).body;
                             // Verify
                             if (verifyUser(username, password)) {
-                                // Reject loopback login
-                                if (main.fileShareClient.socket != null &&
-                                        clSocket.getInetAddress().equals(main.fileShareClient.socket.getInetAddress())) {
-                                    FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Cannot login to local machine"));
-                                    return;
-                                }
+
                                 // Send success message
                                 FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Login successful"));
                                 // Start serving the client socket
