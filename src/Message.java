@@ -74,6 +74,21 @@ public class Message implements Serializable {
 
         return new Object[]{new Message(msgBytes), msgPacket.getAddress(), msgPacket.getPort()};    // {Message, InetAddress, int}
     }
+
+    static Message tcpReceive(DataInputStream din) throws IOException {
+        int msgLen = din.readInt();
+        byte[] msgByte = new byte[msgLen];
+        din.read(msgByte, 0, msgLen);
+
+        return new Message(msgByte);
+    }
+
+    static void tcpSend(DataOutputStream dout, Message msg) throws IOException {
+        byte[] bytes = msg.getBytes();
+        dout.writeInt(bytes.length);
+        dout.write(bytes);
+    }
+
 }
 
 /*

@@ -158,20 +158,6 @@ public class FileShare {
         fileShareClient.discover();
     }
 
-    static Message receiveMsg(DataInputStream din) throws IOException {
-        int msgLen = din.readInt();
-        byte[] msgByte = new byte[msgLen];
-        din.read(msgByte, 0, msgLen);
-
-        return new Message(msgByte);
-    }
-
-    static void sendMsg(DataOutputStream dout, Message msg) throws IOException {
-        byte[] bytes = msg.getBytes();
-        dout.writeInt(bytes.length);
-        dout.write(bytes);
-    }
-
 
     public static void main(String[] args) throws Exception {
         FileShare fileShare = new FileShare();

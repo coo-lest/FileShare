@@ -43,24 +43,24 @@ public class FileShareServer {
 
                             // Request username
                             System.out.println("waiting for username...");
-                            String username = FileShare.receiveMsg(din).body;
+                            String username = Message.tcpReceive(din).body;
                             // Request password
                             System.out.println("waiting for password...");
 
-                            FileShare.sendMsg(dout, new Message(MessageType.REQUEST, "Password: "));
+                            Message.tcpSend(dout, new Message(MessageType.REQUEST, "Password: "));
 
-                            String password = FileShare.receiveMsg(din).body;
+                            String password = Message.tcpReceive(din).body;
                             // Verify
                             if (verifyUser(username, password)) {
 
                                 // Send success message
-                                FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Login successful"));
+                                Message.tcpSend(dout, new Message(MessageType.SUCCESS, "Login successful"));
                                 // Start serving the client socket
                                 serve(clSocket);
 
                             } else {
                                 // Abort the connection
-                                FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Wrong username or password"));
+                                Message.tcpSend(dout, new Message(MessageType.FAILURE, "Wrong username or password"));
                             }
                         } catch (Exception e) {
                             // System.err.println("connection dropped.");
@@ -113,7 +113,7 @@ public class FileShareServer {
 
             while (!Thread.currentThread().isInterrupted()) {
                 // Get request type
-                Message msg = FileShare.receiveMsg(din);
+                Message msg = Message.tcpReceive(din);
 
                 switch (msg.type) {
                     case DOWNLOAD:
@@ -130,9 +130,9 @@ public class FileShareServer {
                         String dirName = msg.body;
                         try {
                             makeDirectory(cwd.getCanonicalPath(), dirName);
-                            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+                            Message.tcpSend(dout, new Message(MessageType.SUCCESS, ""));
                         } catch (Exception e) {
-                            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+                            Message.tcpSend(dout, new Message(MessageType.FAILURE, e.getMessage()));
                         }
                         break;
 
@@ -177,14 +177,14 @@ public class FileShareServer {
     private void sendFile(DataOutputStream dout, String filename) throws IOException {
         File f = new File(filename);
         if (!f.exists()) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exist"));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, "File not exist"));
             return;
         } else if (f.isDirectory()) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "Cannot send directory"));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, "Cannot send directory"));
             return;
         }
         // Start file transmission
-        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+        Message.tcpSend(dout, new Message(MessageType.SUCCESS, "Start transmission"));
         FileInputStream fin = new FileInputStream(f);
         byte[] buffer = new byte[1024];
         // Transmit fSize
@@ -209,9 +209,9 @@ public class FileShareServer {
             dir.mkdirs();
             // Start transmission
             fout = new FileOutputStream(f);
-            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start transmission"));
+            Message.tcpSend(dout, new Message(MessageType.SUCCESS, "Start transmission"));
         } catch (Exception e) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, e.getMessage()));
             return;
         }
         byte[] buffer = new byte[1024];
@@ -228,19 +228,19 @@ public class FileShareServer {
 //        System.out.println("del: " + file);
         try {
             new File(file).delete();
-            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+            Message.tcpSend(dout, new Message(MessageType.SUCCESS, ""));
         } catch (Exception e) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, e.getMessage()));
         }
     }
 
     private void deleteDirectory(DataOutputStream dout, String filename) throws IOException {
         File file = new File(filename);
         if (file.isFile()) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "This is not a directory"));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, "This is not a directory"));
         }
         deleteDirectory(file);
-        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+        Message.tcpSend(dout, new Message(MessageType.SUCCESS, ""));
     }
 
     private boolean deleteDirectory(File dir) {
@@ -258,13 +258,13 @@ public class FileShareServer {
         try {
             File new_fname = new File(newfname);
             if (new_fname.exists()) {
-                FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File/Folder with the same name exists"));
+                Message.tcpSend(dout, new Message(MessageType.FAILURE, "File/Folder with the same name exists"));
                 return;
             }
             new File(fname).renameTo(new_fname);
-            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
+            Message.tcpSend(dout, new Message(MessageType.SUCCESS, ""));
         } catch (Exception e) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, e.getMessage()));
         }
 
     }
@@ -272,7 +272,7 @@ public class FileShareServer {
     private void detail(DataOutputStream dout, String filename) throws IOException {
         File file = new File(filename);
         if (!file.exists()) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, "File not exists"));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, "File not exists"));
         }
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
@@ -294,7 +294,7 @@ public class FileShareServer {
         detailStr += ("canonical file : " + file.getCanonicalFile() + "\n");
         detailStr += ("canonical path : " + file.getCanonicalPath() + "\n");
 
-        FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, detailStr));
+        Message.tcpSend(dout, new Message(MessageType.SUCCESS, detailStr));
     }
 
     private void changeDir(DataOutputStream dout, String dirName) throws IOException {
@@ -334,11 +334,11 @@ public class FileShareServer {
     private void sendTree(DataOutputStream dout) throws IOException {
         try {
             JTree tree = GUI.buildTree(sharedRoot);
-            FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, "Start tree transmission"));
+            Message.tcpSend(dout, new Message(MessageType.SUCCESS, "Start tree transmission"));
             ObjectOutputStream oos = new ObjectOutputStream(dout);
             oos.writeObject(tree);
         } catch (Exception e) {
-            FileShare.sendMsg(dout, new Message(MessageType.FAILURE, e.getMessage()));
+            Message.tcpSend(dout, new Message(MessageType.FAILURE, e.getMessage()));
         }
     }
 

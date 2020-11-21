@@ -2,7 +2,6 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import java.awt.*;
@@ -203,8 +202,8 @@ public class GUI extends JFrame {
         locFT = buildTree(locWorkDir);
         // Fetch remote tree
         try {
-            FileShare.sendMsg(main.fileShareClient.dout, new Message(MessageType.TREE, ""));
-            Message reply = FileShare.receiveMsg(main.fileShareClient.din);
+            Message.tcpSend(main.fileShareClient.dout, new Message(MessageType.TREE, ""));
+            Message reply = Message.tcpReceive(main.fileShareClient.din);
             if (reply.type == MessageType.SUCCESS) {
                 // Transmitting JTree object
                 ObjectInputStream ois = new ObjectInputStream(main.fileShareClient.din);

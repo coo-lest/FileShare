@@ -25,15 +25,15 @@ public class FileShareClient {
         din = new DataInputStream(socket.getInputStream());
         dout = new DataOutputStream(socket.getOutputStream());
 
-        FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
+        Message.tcpSend(dout, new Message(MessageType.DATA, username));
         // Wait for request for password
-        System.out.print(FileShare.receiveMsg(din).body);
+        System.out.print(Message.tcpReceive(din).body);
 
         // Get and send password
-        FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
+        Message.tcpSend(dout, new Message(MessageType.DATA, password));
 
         // Wait for authentication
-        Message authRes = FileShare.receiveMsg(din);
+        Message authRes = Message.tcpReceive(din);
 
         return authRes;
 
@@ -46,16 +46,16 @@ public class FileShareClient {
             din = new DataInputStream(socket.getInputStream());
             dout = new DataOutputStream(socket.getOutputStream());
 
-            FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
+            Message.tcpSend(dout, new Message(MessageType.DATA, username));
             // Wait for request for password
-            System.out.print(FileShare.receiveMsg(din).body);
+            System.out.print(Message.tcpReceive(din).body);
 
             // Get and send password
             String password = FileShare.scanner.nextLine();
-            FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
+            Message.tcpSend(dout, new Message(MessageType.DATA, password));
 
             // Wait for authentication
-            Message authRes = FileShare.receiveMsg(din);
+            Message authRes = Message.tcpReceive(din);
 
             System.out.println(authRes.body);
             if (authRes.type == MessageType.SUCCESS) {
@@ -131,9 +131,9 @@ public class FileShareClient {
             return;
         }
         // Send DOWNLOAD request
-        FileShare.sendMsg(dout, new Message(MessageType.DOWNLOAD, filename));
+        Message.tcpSend(dout, new Message(MessageType.DOWNLOAD, filename));
         // Receive reply from server
-        Message reply = FileShare.receiveMsg(din);
+        Message reply = Message.tcpReceive(din);
         // If transmission can be started
         if (reply.type == MessageType.SUCCESS) {
             // Create directories and file
@@ -173,10 +173,10 @@ public class FileShareClient {
         }
 
         // Send UPLOAD request
-        FileShare.sendMsg(dout, new Message(MessageType.UPLOAD, uploadPath + "/" + f.getName()));
+        Message.tcpSend(dout, new Message(MessageType.UPLOAD, uploadPath + "/" + f.getName()));
 
         // Receive reply from server
-        Message reply = FileShare.receiveMsg(din);
+        Message reply = Message.tcpReceive(din);
         if (reply.type == MessageType.SUCCESS) {
             // Start transmission
             FileInputStream fin = new FileInputStream(f);
@@ -196,16 +196,16 @@ public class FileShareClient {
     }
 
     void mkdir(String dirName) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.MKDIR, dirName));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.MKDIR, dirName));
+        Message res = Message.tcpReceive(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
     }
 
     String detail(String filename) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.DETAIL, filename));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.DETAIL, filename));
+        Message res = Message.tcpReceive(din);
         if (res.type == MessageType.SUCCESS) {
             System.out.println(res.body);
         } else {
@@ -215,8 +215,8 @@ public class FileShareClient {
     }
 
     Message rename(String oldName, String newName) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.RENAME, oldName + "\\?" + newName));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.RENAME, oldName + "\\?" + newName));
+        Message res = Message.tcpReceive(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
@@ -224,24 +224,24 @@ public class FileShareClient {
     }
 
     void delete(String filename) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.DELETE, filename));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.DELETE, filename));
+        Message res = Message.tcpReceive(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
     }
 
     void rmdir(String dirName) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.RMDIR, dirName));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.RMDIR, dirName));
+        Message res = Message.tcpReceive(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
     }
 
     void cd(String dirName) throws IOException {
-        FileShare.sendMsg(dout, new Message(MessageType.CD, dirName));
-        Message res = FileShare.receiveMsg(din);
+        Message.tcpSend(dout, new Message(MessageType.CD, dirName));
+        Message res = Message.tcpReceive(din);
         if (res.type != MessageType.SUCCESS) {
             System.out.println(res.body);
         }
