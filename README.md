@@ -22,7 +22,8 @@ The developers admit that this is not a robust program. Use with care!
 Here are some known issues:
 * **Upload/Download/NewFolder to a *File* (instead of a Folder) will cause problem**  
 Just make sure you select a *folder* as the destination.  
-This may also cause unpredicted problems in subsequent operations!  
+**This may also cause unpredicted problems in subsequent operations!** In that case, try 
+to logout and re-login or restart the program.
 
 * **Error may prompt when login to hosts in *another network***  
 Due to some problem with the class `ObjectOutputStream`, bytes of an object may
