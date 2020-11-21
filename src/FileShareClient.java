@@ -239,12 +239,4 @@ public class FileShareClient {
         }
     }
 
-    void cd(String dirName) throws IOException {
-        Message.tcpSend(dout, new Message(MessageType.CD, dirName));
-        Message res = Message.tcpReceive(din);
-        if (res.type != MessageType.SUCCESS) {
-            System.out.println(res.body);
-        }
-
-    }
 }

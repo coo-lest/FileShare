@@ -153,10 +153,6 @@ public class FileShareServer {
                         deleteDirectory(dout, cwd.getCanonicalFile() + File.separator + msg.body);
                         break;
 
-                    case CD:
-                        changeDir(dout, cwd.getCanonicalFile() + File.separator + msg.body);
-                        break;
-
                     case TREE:
                         sendTree(dout);
                         break;
@@ -295,12 +291,6 @@ public class FileShareServer {
         detailStr += ("canonical path : " + file.getCanonicalPath() + "\n");
 
         Message.tcpSend(dout, new Message(MessageType.SUCCESS, detailStr));
-    }
-
-    private void changeDir(DataOutputStream dout, String dirName) throws IOException {
-        // TODO: [AML] Please implement change directory function here (change `cwd`)
-        //  Use FileShare.sendMsg to send corresponding response to client (refer to the methods above)
-        //  Remember to check conditions (directory not exists, etc..) and send FAILURE message with corresponding body
     }
 
     private boolean verifyUser(String username, String password) {

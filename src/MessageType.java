@@ -11,7 +11,6 @@ public enum MessageType {
     RENAME,
     DELETE,
     RMDIR,
-    CD,
     TREE
 
 }
