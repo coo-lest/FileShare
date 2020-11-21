@@ -42,10 +42,10 @@ public class FileShareServer {
                             byte[] buffer = new byte[1024];
 
                             // Request username
-                            System.out.println("waiting for username...");
+//                            System.out.println("waiting for username...");
                             String username = FileShare.receiveMsg(din).body;
                             // Request password
-                            System.out.println("waiting for password...");
+//                            System.out.println("waiting for password...");
 
                             FileShare.sendMsg(dout, new Message(MessageType.REQUEST, "Password: "));
 
@@ -79,7 +79,7 @@ public class FileShareServer {
         Thread udpListen = new Thread(() -> {
             while (true) {
                 try {
-                    System.out.println("Waiting for UDP connection");
+//                    System.out.println("Waiting for UDP connection");
                     Object[] udpRcvd = Message.udpReceive(udpSocket);  // {Message, InetAddress, int}
                     Message msg = (Message) udpRcvd[0];
                     InetAddress srcAdd = (InetAddress) udpRcvd[1];
@@ -225,7 +225,7 @@ public class FileShareServer {
     }
 
     private void deleteFile(DataOutputStream dout, String file) throws IOException {
-        System.out.println("del: " + file);
+//        System.out.println("del: " + file);
         try {
             new File(file).delete();
             FileShare.sendMsg(dout, new Message(MessageType.SUCCESS, ""));
@@ -304,8 +304,8 @@ public class FileShareServer {
     }
 
     private boolean verifyUser(String username, String password) {
-        System.out.println("Received username: " + username);
-        System.out.println("Received password: " + password);
+//        System.out.println("Received username: " + username);
+//        System.out.println("Received password: " + password);
 
         File authFile = new File("authorized_users");
         if (authFile.isFile()) {
