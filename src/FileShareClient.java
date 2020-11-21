@@ -27,7 +27,7 @@ public class FileShareClient {
 
         FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
         // Wait for request for password
-//        System.out.print(FileShare.receiveMsg(din).body);
+        System.out.print(FileShare.receiveMsg(din).body);
 
         // Get and send password
         FileShare.sendMsg(dout, new Message(MessageType.DATA, password));
@@ -48,7 +48,7 @@ public class FileShareClient {
 
             FileShare.sendMsg(dout, new Message(MessageType.DATA, username));
             // Wait for request for password
-//            System.out.print(FileShare.receiveMsg(din).body);
+            System.out.print(FileShare.receiveMsg(din).body);
 
             // Get and send password
             String password = FileShare.scanner.nextLine();
@@ -57,14 +57,14 @@ public class FileShareClient {
             // Wait for authentication
             Message authRes = FileShare.receiveMsg(din);
 
-//            System.out.println(authRes.body);
+            System.out.println(authRes.body);
             if (authRes.type == MessageType.SUCCESS) {
                 isConnected = true;
             } else {
                 isConnected = false;
                 socket.close();
             }
-//            System.out.println(isConnected);
+            System.out.println(isConnected);
         } catch (IOException e) {
             System.err.println("Connection error");
         }
