@@ -90,11 +90,3 @@ public class Message implements Serializable {
     }
 
 }
-
-/*
- List of msgNos and corresponding meaning
-    0: (String) Success
-    1: (String) Fail
-    ...
-
- */
